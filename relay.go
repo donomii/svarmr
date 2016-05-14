@@ -64,11 +64,11 @@ func copyLines(c1, c2 net.Conn) {
 func main() {
     server1 := os.Args[1]
     port1 := os.Args[2]
-    server2 := os.Args[1]
-    port2 := os.Args[2]
+    server2 := os.Args[3]
+    port2 := os.Args[4]
     conn1 := svarmrgo.ConnectHub(server1, port1)
     conn2 := svarmrgo.ConnectHub(server2, port2)
-    //go copyLines(conn1, conn2)
+    go copyLines(conn1, conn2)
     go copyLines(conn2, conn1)
 	fmt.Printf("Started relay\n")
 	for {}
