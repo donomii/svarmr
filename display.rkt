@@ -5,7 +5,7 @@
 (require json)
 [define last-data ""]
 [define last-md5 [md5 last-data]]
-(define-values (in out) (tcp-connect "192.168.1.104" 4816))
+(define-values (in out) (tcp-connect "localhost" 4816))
 
 (define process-port (lambda (a-port)
                        [let [[line (read-line a-port 'return-linefeed)]]
