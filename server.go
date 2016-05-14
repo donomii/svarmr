@@ -55,6 +55,7 @@ func main() {
     ln, err := net.Listen("tcp", "0.0.0.0:4816")
     if err != nil {
         fmt.Printf("Couldn't open port 4816")
+		os.Exit(1)
     }
     for {
 		fmt.Printf("Listener loop")
