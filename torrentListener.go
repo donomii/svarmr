@@ -6,14 +6,10 @@ import (
     "encoding/json"
     "os/exec"
     "bytes"
+    "github.com/donomii/svarmrgo"
     "time"
     "strings"
 )
-
-type Message struct {
-    Selector string
-    Arg string
-}
 
 func handleConnection (conn net.Conn) {
     fmt.Sprintf("%V", conn)
@@ -24,7 +20,7 @@ func handleConnection (conn net.Conn) {
         if (l!="") {
                 var text = l
                 fmt.Printf("%v\n", text)
-                var m Message
+                var m svarmrgo.Message
                 err := json.Unmarshal([]byte(text), &m)
                 if err != nil {
                     fmt.Println("error:", err)
@@ -32,7 +28,7 @@ func handleConnection (conn net.Conn) {
                     fmt.Printf("%v", m)
                     switch m.Selector {
                          case "reveal-yourself" :
-                            response := Message{Selector: "announce", Arg: "torrent control"}
+                            response := svarmrgo.Message{Selector: "announce", Arg: "torrent control"}
                             out, _ := json.Marshal(response)
                             fmt.Printf("%s\r\n", out)
                             fmt.Fprintf(conn, fmt.Sprintf("%s\r\n", out))
@@ -44,7 +40,7 @@ func handleConnection (conn net.Conn) {
                                 cmd.Run()
 				time.Sleep(5000 * time.Millisecond)
 				fmt.Printf("%V\n", out)
-                                response := Message{Selector: "torrent-status", Arg: string(out.Bytes())}
+                                response := svarmrgo.Message{Selector: "torrent-status", Arg: string(out.Bytes())}
                                 o, _ := json.Marshal(response)
                                 fmt.Printf("%s\r\n", o)
                                 fmt.Fprintf(conn, fmt.Sprintf("%s\r\n", o))
@@ -54,6 +50,8 @@ func handleConnection (conn net.Conn) {
                                 var out bytes.Buffer
                                 cmd.Stdout = &out
                                 cmd.Run()
+                                response := svarmrgo.Message{Selector: "user-notify", Arg: "Started torrent"}
+				svarmrgo.RespondWith(conn, response)
                     }
                 }
             }
