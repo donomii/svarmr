@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+  <name replace-wildcards="yes">Svarmr command bus</name>
+  <service>
+    <type>_svarmr._tcp</type>
+    <port>4816</port>
+    <txt-record></txt-record>
+  </service>
+</service-group>
