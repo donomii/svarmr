@@ -33,31 +33,31 @@ type NotifyArgs struct {
 
 
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
-                    fmt.Printf("%v", m)
                     switch m.Selector {
                          case "reveal-yourself" :
 			        svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
                          case "user-notify" :
                                 cmd := exec.Command("notifu/notifu.exe", "/m", m.Arg, "/p", "Svarmr", "/t", "info")
-								runCommand(cmd,  strings.NewReader("")) 
+								runCommand(cmd,  strings.NewReader(""))
 						case "user-notify-error" :
                                 cmd := exec.Command("notifu/notifu.exe", "/m", m.Arg, "/p", "Svarmr", "/t", "error")
 								runCommand(cmd,  strings.NewReader(""))
 						case "user-notify-custom" :
 							    var a NotifyArgs
 								err := json.Unmarshal([]byte(m.Arg), &a)
-								fmt.Printf("Error: %v\n", err)
+								if err != nil {
+                    fmt.Printf("Error: %v\n", err)
+                  }
                                 cmd := exec.Command("notifu/notifu.exe", "/m", a.Message, "/p", a.Title, "/t", a.Level, "/d", a.Duration)
-								fmt.Printf("%v\n",cmd)
+								//fmt.Printf("%v\n",cmd)
 								runCommand(cmd,  strings.NewReader(""))
                                 //svarmrgo.RespondWith(conn, Message{Selector: "process-list", Arg: string(out.Bytes())})
                     }
                 }
-            
-    
+
+
 
 func main() {
 		conn := svarmrgo.CliConnect()
         svarmrgo.HandleInputs(conn, handleMessage)
     }
-

@@ -15,7 +15,7 @@ type Message struct {
 
 func respondWith(conn net.Conn, response Message) {
 out, _ := json.Marshal(response)
-fmt.Fprintf(conn, fmt.Sprintf("%s\r\n", out))
+fmt.Fprintf(conn, fmt.Sprintf("%s\n", out))
 }
 
 func handleConnection (conn net.Conn) {

@@ -14,7 +14,7 @@ func main() {
     out, _ := json.Marshal(m)
     fmt.Printf("%s\r\n", out)
     for {
-	    fmt.Fprintf(conn, fmt.Sprintf("%s\r\n", out))
+	    fmt.Fprintf(conn, fmt.Sprintf("%s\n", out))
 	    time.Sleep(1000 * time.Millisecond)
 	}
 }

@@ -20,7 +20,7 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) bytes.Buffer{
 	cmd.Run()
 	return out
 }
-
+var relayID string
 func handleConnection (conn net.Conn) {
     fmt.Sprintf("%V", conn)
     time.Sleep(500 * time.Millisecond)
@@ -38,7 +38,9 @@ func handleConnection (conn net.Conn) {
                     fmt.Printf("%v", m)
                     switch m.Selector {
                          case "reveal-yourself" :
-								svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "system monitor"})
+								svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: relayID})
+              case "shutdown" :
+                        os.Exit(0)
                          case "show-processes" :
                                 cmd := exec.Command("ps", "auxc")
 								out := runCommand(cmd,  strings.NewReader(""))
@@ -66,10 +68,13 @@ func main() {
     port1 := os.Args[2]
     server2 := os.Args[3]
     port2 := os.Args[4]
+    relayID = fmt.Sprintf("relay %v:%v - %v:%v",server1, port1, server2,port2)
     conn1 := svarmrgo.ConnectHub(server1, port1)
     conn2 := svarmrgo.ConnectHub(server2, port2)
+	conn3 := svarmrgo.ConnectHub(server1, port1)
     go copyLines(conn1, conn2)
     go copyLines(conn2, conn1)
+	handleConnection (conn)
 	fmt.Printf("Started relay\n")
 	for {}
 }

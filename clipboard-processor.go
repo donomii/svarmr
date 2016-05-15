@@ -4,8 +4,7 @@ package main
 // Copy it into a sub-directory called "notifu"
 import (
     "net"
-    "fmt"
-    "encoding/json"
+"os"
     "os/exec"
     "bytes"
 	"io"
@@ -23,30 +22,25 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) bytes.Buffer{
 	return out
 }
 
-func respondWith(conn net.Conn, response svarmrgo.Message) {
-	out, _ := json.Marshal(response)
-	fmt.Fprintf(conn, fmt.Sprintf("%s\r\n", out))
-}
-
-
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
-                    fmt.Printf("%v", m)
                     switch m.Selector {
                          case "reveal-yourself" :
-								respondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
+								                   svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
+                                 case "shutdown" :
+                                           os.Exit(0)
+
                          case "clipboard-change" :
 								if match, _ := regexp.MatchString("magnet", m.Arg); match {
-									respondWith(conn, svarmrgo.Message{Selector: "add-torrent", Arg: m.Arg})
+									svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "add-torrent", Arg: m.Arg})
 								} else {
-									respondWith(conn, svarmrgo.Message{Selector: "user-notify-error", Arg: m.Arg})
+									svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "user-notify-error", Arg: m.Arg})
 								}
                     }
                 }
-            
-    
+
+
 
 func main() {
 		conn := svarmrgo.CliConnect()
         svarmrgo.HandleInputs(conn, handleMessage)
     }
-
