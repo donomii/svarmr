@@ -3,12 +3,10 @@ import (
     "net"
     "bufio"
     "fmt"
-    "encoding/json"
     "os/exec"
     "bytes"
     "time"
 	"io"
-	"strings"
     "github.com/donomii/svarmrgo"
 	"os"
 )
@@ -22,21 +20,7 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) bytes.Buffer{
 }
 var relayID string
 var altRelayID string
-func handleConnection (conn net.Conn) {
-    fmt.Sprintf("%V", conn)
-    time.Sleep(500 * time.Millisecond)
-    r := bufio.NewReader(conn)
-    for {
-        l,_ := r.ReadString('\n')
-        if (l!="") {
-                var text = l
-                fmt.Printf("%v\n", text)
-                var m svarmrgo.Message
-                err := json.Unmarshal([]byte(text), &m)
-                if err != nil {
-                    fmt.Println("error:", err)
-                } else {
-                    fmt.Printf("%v", m)
+func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     switch m.Selector {
                          case "announce" :
 				if relayID == m.Arg { //We either have a loop or we have two copies of the same relay running
@@ -50,9 +34,6 @@ func handleConnection (conn net.Conn) {
               case "shutdown" :
                         os.Exit(0)
                     }
-                }
-            }
-        }
     }
 
 func copyLines(c1, c2 net.Conn) {
@@ -84,11 +65,10 @@ func main() {
     conn1 := svarmrgo.ConnectHub(server1, port1)
     conn2 := svarmrgo.ConnectHub(server2, port2)
 	conn3 := svarmrgo.ConnectHub(server1, port1)
-	go announceMe(conn1)
-	go announceMe(conn2)
+	go announceMe(conn3)
     go copyLines(conn1, conn2)
     go copyLines(conn2, conn1)
-	handleConnection (conn3)
+	go svarmrgo.HandleInputs (conn3, handleMessage)
 	fmt.Printf("Started relay\n")
 	for {}
 }
