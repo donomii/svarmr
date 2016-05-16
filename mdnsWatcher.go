@@ -39,7 +39,7 @@ func watchDNS (entriesCh chan *mdns.ServiceEntry) {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
      switch m.Selector {
         case "reveal-yourself" :
-           svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "heartbeat"})
+           svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "mDnsWatcher"})
       }
 }
 
