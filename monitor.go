@@ -1,14 +1,13 @@
 package main
 import (
     "net"
-    "bufio"
     "fmt"
     "encoding/json"
     "os/exec"
     "bytes"
-    "time"
 	"io"
 "strings"
+    "github.com/donomii/svarmrgo"
 )
 
 type Message struct {
@@ -29,21 +28,7 @@ func respondWith(conn net.Conn, response Message) {
 	fmt.Fprintf(conn, fmt.Sprintf("%s\r\n", out))
 }
 
-func handleConnection (conn net.Conn) {
-    fmt.Sprintf("%V", conn)
-    time.Sleep(500 * time.Millisecond)
-    r := bufio.NewReader(conn)
-    for {
-        l,_ := r.ReadString('\n')
-        if (l!="") {
-                var text = l
-                fmt.Printf("%v\n", text)
-                var m Message
-                err := json.Unmarshal([]byte(text), &m)
-                if err != nil {
-                    fmt.Println("error:", err)
-                } else {
-                    fmt.Printf("%v", m)
+func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     switch m.Selector {
                          case "reveal-yourself" :
 			        respondWith(conn, Message{Selector: "announce", Arg: "system monitor"})
@@ -53,19 +38,8 @@ func handleConnection (conn net.Conn) {
                                 respondWith(conn, Message{Selector: "process-list", Arg: string(out.Bytes())})
                     }
                 }
-            }
-        }
-    }
 
 func main() {
-    conn, err := net.Dial("tcp", "localhost:4816")
-    if err != nil {
-        // handle error
-    }
-    for {
-        if err != nil {
-            fmt.Printf("Could not connect to server!")
-        }
-        handleConnection(conn)
-    }
+    conn := svarmrgo.CliConnect()
+    svarmrgo.HandleInputs(conn, handleMessage)
 }
