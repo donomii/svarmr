@@ -67,10 +67,10 @@ func main() {
     conn1 := svarmrgo.ConnectHub(server1, port1)
     conn2 := svarmrgo.ConnectHub(server2, port2)
 	conn3 := svarmrgo.ConnectHub(server1, port1)
-	go announceMe(conn3)
     go copyLines(conn1, conn2)
     go copyLines(conn2, conn1)
 	go svarmrgo.HandleInputs (conn3, handleMessage)
+	go announceMe(conn3)
 	fmt.Printf("Started relay\n")
 	for {}
 }
