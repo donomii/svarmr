@@ -24,9 +24,11 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     switch m.Selector {
                          case "announce" :
 				if relayID == m.Arg { //We either have a loop or we have two copies of the same relay running
+                    fmt.Printf("Detected routing loop - exiting!\n");
 					os.Exit(0)
 				}
 				if altRelayID == m.Arg { //We either have a loop or we have two copies of the same relay running
+                    fmt.Printf("Detected routing loop - exiting!\n");
 					os.Exit(0)
 				}
                          case "reveal-yourself" :

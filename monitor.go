@@ -6,7 +6,7 @@ import (
     "os/exec"
     "bytes"
 	"io"
-"strings"
+//"strings"
     "github.com/donomii/svarmrgo"
 )
 
@@ -31,11 +31,9 @@ func respondWith(conn net.Conn, response Message) {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     switch m.Selector {
                          case "reveal-yourself" :
-			        respondWith(conn, Message{Selector: "announce", Arg: "system monitor"})
-                         case "show-processes" :
-                                cmd := exec.Command("ps", "auxc")
-				out := runCommand(cmd,  strings.NewReader(""))
-                                respondWith(conn, Message{Selector: "process-list", Arg: string(out.Bytes())})
+                            respondWith(conn, Message{Selector: "announce", Arg: "system monitor"})
+                        default :
+                            fmt.Printf("%v:%v\n", m.Selector, m.Arg)
                     }
                 }
 

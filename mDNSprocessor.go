@@ -9,7 +9,7 @@ import (
     "bytes"
 	"io"
     "github.com/donomii/svarmrgo"
-	"regexp"
+    "strings"
 )
 
 

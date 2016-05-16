@@ -31,7 +31,6 @@ func watchDNS (entriesCh chan *mdns.ServiceEntry) {
 
         // Start the lookup
         go mdns.Lookup("_svarmr._tcp", entriesCh)
-        fmt.Println("Waiting for responses")
         time.Sleep(10000 * time.Millisecond)
     }
 }
