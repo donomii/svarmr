@@ -74,7 +74,7 @@ func main() {
 	conn3 := svarmrgo.ConnectHub(server1, port1)
     go copyLines(conn1, conn2)
     go copyLines(conn2, conn1)
-	handleConnection (conn)
+	handleConnection (conn3)
 	fmt.Printf("Started relay\n")
 	for {}
 }
