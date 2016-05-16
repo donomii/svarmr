@@ -29,7 +29,7 @@ func watchDNS (entriesCh chan *mdns.ServiceEntry) {
     for {
         // Start the lookup
         go mdns.Lookup("_svarmr._tcp", entriesCh)
-        time.Sleep(120000 * time.Millisecond)
+        time.Sleep(600000 * time.Millisecond)
     }
 }
 
@@ -51,5 +51,7 @@ func main() {
            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "mdns-found-ipv6", Arg: fmt.Sprintf("%v:%v", entry.AddrV6, entry.Port)})
         }
     }()
-    for{}
+    for{
+        time.Sleep(120000 * time.Millisecond)
+    }
 }
