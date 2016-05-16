@@ -45,7 +45,6 @@ func copyLines(c1, c2 net.Conn) {
 		if err != nil {
 			os.Exit(1)
 		}
-		fmt.Printf("%s", l)
 	    fmt.Fprintf(c2, fmt.Sprintf("%s\n", l))
     }
 }
