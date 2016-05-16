@@ -62,8 +62,8 @@ func main() {
     port1 := os.Args[2]
     server2 := os.Args[3]
     port2 := os.Args[4]
-    relayID = fmt.Sprintf("relay %v:%v - %v:%v",server1, port1, server2,port2)
-    relayID = fmt.Sprintf("relay %v:%v - %v:%v",server2, port2, server1,port1)
+    relayID = fmt.Sprintf("relay %v:%v - %v:%v (%v)",server1, port1, server2,port2, os.Getpid())
+    altRelayID = fmt.Sprintf("relay %v:%v - %v:%v (%v)",server2, port2, server1,port1, os.Getpid())
     conn1 := svarmrgo.ConnectHub(server1, port1)
     conn2 := svarmrgo.ConnectHub(server2, port2)
 	conn3 := svarmrgo.ConnectHub(server1, port1)

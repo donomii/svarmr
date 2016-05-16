@@ -27,11 +27,9 @@ import "github.com/hashicorp/mdns"
 
 func watchDNS (entriesCh chan *mdns.ServiceEntry) {
     for {
-        // Make a channel for results and start listening
-
         // Start the lookup
         go mdns.Lookup("_svarmr._tcp", entriesCh)
-        time.Sleep(10000 * time.Millisecond)
+        time.Sleep(120000 * time.Millisecond)
     }
 }
 
@@ -44,7 +42,6 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
 
 func main() {
     conn := svarmrgo.CliConnect()
-//    arg := os.Args[3]
     go svarmrgo.HandleInputs(conn, handleMessage)
     entriesCh := make(chan *mdns.ServiceEntry, 4) 
     go watchDNS(entriesCh)

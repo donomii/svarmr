@@ -31,7 +31,6 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) string{
 }
 
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
-    fmt.Printf("Processor got message\n")
                     switch m.Selector {
                          case "reveal-yourself" :
                                svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "mDnsProcessor"})
