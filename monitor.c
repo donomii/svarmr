@@ -125,6 +125,9 @@ static void process_value(json_value* value, int depth)
                 case json_boolean:
                         printf("bool: %d\n", value->u.boolean);
                         break;
+                case json_null:
+                        printf("null: \n");
+                        break;
         }
 }
 
@@ -156,8 +159,6 @@ int main(int argc, char *argv[])
     #ifdef _WIN32
        WSADATA wsa_data;
        WSAStartup(MAKEWORD(1,1), &wsa_data);
-     #else
-       return 0;
      #endif
 
 
