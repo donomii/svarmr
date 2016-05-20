@@ -39,17 +39,23 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
                          case "user-notify" :
                                 cmd := exec.Command("notifu/notifu.exe", "/m", m.Arg, "/p", "Svarmr", "/t", "info")
 								runCommand(cmd,  strings.NewReader(""))
+                                cmd = exec.Command("osascript", "-e", fmt.Sprintf("display notification \"%v\" with title \"Svarmr\" ", m.Arg))
+								runCommand(cmd,  strings.NewReader(""))
 						case "user-notify-error" :
                                 cmd := exec.Command("notifu/notifu.exe", "/m", m.Arg, "/p", "Svarmr", "/t", "error")
+								runCommand(cmd,  strings.NewReader(""))
+                                cmd = exec.Command("osascript", "-e", fmt.Sprintf("display notification \"%v\" with title \"Svarmr\" ", m.Arg))
 								runCommand(cmd,  strings.NewReader(""))
 						case "user-notify-custom" :
 							    var a NotifyArgs
 								err := json.Unmarshal([]byte(m.Arg), &a)
 								if err != nil {
-                    fmt.Printf("Error: %v\n", err)
-                  }
+                                    fmt.Printf("Error: %v\n", err)
+                                }
                                 cmd := exec.Command("notifu/notifu.exe", "/m", a.Message, "/p", a.Title, "/t", a.Level, "/d", a.Duration)
 								//fmt.Printf("%v\n",cmd)
+								runCommand(cmd,  strings.NewReader(""))
+                                cmd = exec.Command("osascript", "-e", fmt.Sprintf("display notification \"%v\" with title \"Svarmr\" ", m.Arg))
 								runCommand(cmd,  strings.NewReader(""))
                                 //svarmrgo.RespondWith(conn, Message{Selector: "process-list", Arg: string(out.Bytes())})
                     }

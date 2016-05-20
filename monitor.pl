@@ -11,7 +11,7 @@ use IO::Socket::INET;
 
 while ( my $line = <$sock> ) {
     my $s = decode_json($line);
-    warn "** ".$s->{Selector}." **\n\n".$s->{Arg}."\n\n\n";
+    print "** ".$s->{Selector}." **\n\n".$s->{Arg}."\n\n\n";
 }
 
 

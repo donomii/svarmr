@@ -1,8 +1,10 @@
 go build server.go
 go build relay.go
 go build volume.go
-go build heartbeat.go
+go build heartBeat.go
 go build monitor.go
 go build mdnsWatcher.go
 go build mDNSprocessor.go
-gcc monitor.c -Os -flto
+go build svarmrMessage.go
+go build moduleStarter.go
+gcc monitor.c -Os -flto -omonitorc

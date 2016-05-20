@@ -1,8 +1,10 @@
-pkill -f 4816
+#!/bin/bash
+export HOST=localhost
+export PORT=4816
+pkill -f $PORT
 sh build.sh
-./server localhost 4816 &
-sleep 5
-./heartbeat localhost 4816 `hostname`&
-./monitor localhost 4816 &
-./mdnsWatcher localhost 4816 2> /dev/null &
-./mDNSprocessor localhost 4816 &
+./server $HOST $PORT &
+sleep 2
+./heartBeat $HOST $PORT `hostname` &
+./moduleStarter $HOST $PORT &
+echo Server started
