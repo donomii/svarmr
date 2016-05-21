@@ -36,7 +36,7 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
             os.Exit(0)
 
          case "mdns-found-svarmr-ipv4" :
-            /'nix
+            //'nix
             arr := strings.Split(m.Arg, ":")
             cmd := exec.Command("./relay", os.Args[1], os.Args[2],arr[0], arr[1])
             fmt.Printf("Starting new relay %v\n", cmd)
