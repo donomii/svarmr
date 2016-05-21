@@ -35,7 +35,7 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
             case "shutdown" :
             os.Exit(0)
 
-         case "mdns-found-ipv4" :
+         case "mdns-found-svarmr-ipv4" :
             /'nix
             arr := strings.Split(m.Arg, ":")
             cmd := exec.Command("./relay", os.Args[1], os.Args[2],arr[0], arr[1])
@@ -52,6 +52,6 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
 
 
 func main() {
-	conn := svarmrgo.CliConnect()
-        svarmrgo.HandleInputs(conn, handleMessage)
-    }
+    conn := svarmrgo.CliConnect()
+    svarmrgo.HandleInputs(conn, handleMessage)
+}
