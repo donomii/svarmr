@@ -29,22 +29,25 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) string{
 }
 
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
-                    switch m.Selector {
-                         case "reveal-yourself" :
-                               svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "mDnsProcessor"})
-                                 case "shutdown" :
-                                           os.Exit(0)
+    switch m.Selector {
+         case "reveal-yourself" :
+            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "mDnsProcessor"})
+            case "shutdown" :
+            os.Exit(0)
 
-                         case "mdns-found-ipv4" :
-                            arr := strings.Split(m.Arg, ":")
-                          cmd := exec.Command("./relay", os.Args[1], os.Args[2],arr[0], arr[1])
-                fmt.Printf("Starting new relay %v\n", cmd)
-				go runCommand(cmd, strings.NewReader("some input") )
-        cmd = exec.Command("relay.exe", os.Args[1], os.Args[2],arr[0], arr[1])
-fmt.Printf("Starting new relay %v\n", cmd)
-go runCommand(cmd, strings.NewReader("some input") )
-				}
-                    }
+         case "mdns-found-ipv4" :
+            /'nix
+            arr := strings.Split(m.Arg, ":")
+            cmd := exec.Command("./relay", os.Args[1], os.Args[2],arr[0], arr[1])
+            fmt.Printf("Starting new relay %v\n", cmd)
+            go runCommand(cmd, strings.NewReader("some input") )
+
+            //Windows
+            cmd = exec.Command("relay.exe", os.Args[1], os.Args[2],arr[0], arr[1])
+            fmt.Printf("Starting new relay %v\n", cmd)
+            go runCommand(cmd, strings.NewReader("some input") )
+    }
+}
 
 
 
