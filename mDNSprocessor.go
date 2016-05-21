@@ -1,10 +1,8 @@
 package main
 
-// This module requires the Notifu utility from http://www.paralint.com/projects/notifu/index.html#Download
-// Copy it into a sub-directory called "notifu"
 import (
     "net"
-"os"
+    "os"
     "os/exec"
     "bytes"
 	"io"
