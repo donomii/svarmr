@@ -8,9 +8,15 @@ import (
     "time"
 "net"
 "os"
+"math/rand"
+ "github.com/hashicorp/mdns"
 )
 
-import "github.com/hashicorp/mdns"
+
+
+func random(min, max int) int {
+    return rand.Intn(max - min) + min
+}
 
 //type ServiceEntry struct {
 //>···Name       string
@@ -29,11 +35,12 @@ import "github.com/hashicorp/mdns"
 
 var server *mdns.Server
 
+
 func watchDNS (entriesCh chan *mdns.ServiceEntry) {
     for {
         // Start the lookup
         go mdns.Lookup("_svarmr._tcp.", entriesCh)
-        time.Sleep(6000 * time.Millisecond)
+        time.Sleep(time.Duration(random(5000,30000))*time.Millisecond)
     }
 }
 
@@ -97,6 +104,7 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
 }
 
 func main() {
+    rand.Seed(time.Now().Unix())
     conn := svarmrgo.CliConnect()
     go svarmrgo.HandleInputs(conn, handleMessage)
     entriesCh := make(chan *mdns.ServiceEntry, 4) 
