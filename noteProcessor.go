@@ -32,7 +32,7 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) string{
 }
 
 func l (conn net.Conn, k string) {
-            cmd := exec.Command("sendkey.ahk", k)
+            cmd := exec.Command("c:\\Program Files\\AutoHotkey\\AutoHotkey","sendkey.ahk", k)
             runCommand(cmd,  strings.NewReader(""))
 }
 
