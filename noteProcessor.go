@@ -1,6 +1,7 @@
 package main
 
 import (
+    "strings"
     "net"
     "os"
     "os/exec"
@@ -31,7 +32,8 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) string{
 }
 
 func l (conn net.Conn, k string) {
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "send-key", Arg: k})
+            cmd := exec.Command("sendkey.ahk", k)
+            runCommand(cmd,  strings.NewReader(""))
 }
 
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
