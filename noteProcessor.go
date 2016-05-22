@@ -48,13 +48,13 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
                 case "A2" :
                     l(conn, "h")
                 case "A#2" :
-                    l(conn, "h")
-                case "B2" :
                     l(conn, "j")
-                case "C2" :
+                case "B2" :
                     l(conn, "k")
-                case "C#2" :
+                case "C2" :
                     l(conn, "l")
+                case "C#2" :
+                    l(conn, "i")
             }
     }
 }
