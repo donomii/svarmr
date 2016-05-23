@@ -8,4 +8,5 @@ go build mDNSprocessor.go &
 go build svarmrMessage.go &
 go build moduleStarter.go &
 gcc monitor.c -Os -flto -omonitorc &
+cd pitchDetect && gcc -l PortAudio pitchDetect.c -o pitchDetect &
 wait
