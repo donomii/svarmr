@@ -11,21 +11,8 @@ import (
     "strings"
 )
 
-func handleConnection (conn net.Conn) {
-    fmt.Sprintf("%V", conn)
-    time.Sleep(500 * time.Millisecond)
-    r := bufio.NewReader(conn)
-    for {
-        l,_ := r.ReadString('\n')
-        if (l!="") {
-                var text = l
-                fmt.Printf("%v\n", text)
-                var m svarmrgo.Message
-                err := json.Unmarshal([]byte(text), &m)
-                if err != nil {
-                    fmt.Println("error:", err)
-                } else {
-                    fmt.Printf("%v", m)
+func handleMessage (conn net.Conn, m svarmrgo.Message) {
+
                     switch m.Selector {
                          case "reveal-yourself" :
                             response := svarmrgo.Message{Selector: "announce", Arg: "torrent control"}
@@ -54,9 +41,6 @@ func handleConnection (conn net.Conn) {
 				svarmrgo.RespondWith(conn, response)
                     }
                 }
-            }
-        }
-    }
 
 func main() {
     conn, err := net.Dial("tcp", "localhost:4816")
@@ -67,6 +51,6 @@ func main() {
         if err != nil {
             fmt.Printf("Could not connect to server!")
         }
-        handleConnection(conn)
+ svarmrgo.HandleInputs(conn, handleMessage)
     }
 }
