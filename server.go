@@ -7,6 +7,9 @@ import (
 
 )
 
+var inMessages int = 0
+var outMessages int = 0
+
 type connection struct {
     port net.Conn
     raw string
@@ -14,20 +17,28 @@ type connection struct {
 
 var connList []net.Conn
 
+func writeMessage (c connection) {
+                        w := bufio.NewWriter(c)
+                        w.Write([]byte(m.raw))
+                        w.Write([]byte("\n"))
+                        w.Flush()
+                    }
+
 func broadcast(Q chan connection) {
     for {
             m := <- Q
+            inMessages++
             for _, c := range connList {
                 if ( c != nil && c != m.port) {
-                    w := bufio.NewWriter(c)
-                    w.Write([]byte(m.raw))
-                    w.Write([]byte("\n"))
-
-                    w.Flush()
+                    go writeMessage(c) //FIXME use proper output queues so we can drop misbehaving clients
+                        outMessages++
                 }
             }
         }
 }
+
+
+//Read incoming messages and place them on the input queue
 func handleConnection (conn net.Conn, Q chan connection) {
     //scanner := bufio.NewScanner(conn)
 	reader := bufio.NewReader(conn)
@@ -36,8 +47,8 @@ func handleConnection (conn net.Conn, Q chan connection) {
             //for scanner.Scan() {
 				t,err := reader.ReadString('\n')
 				if err != nil {
-          fmt.Println("Client disconnected")
-					return
+                        fmt.Println("Client disconnected: ", err)
+                        return
 				}
                 var m connection = connection{ conn, t }
                 Q <- m

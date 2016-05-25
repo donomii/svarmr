@@ -7,4 +7,5 @@ sh build.sh
 sleep 2
 ./heartBeat $HOST $PORT `hostname` &
 ./moduleStarter $HOST $PORT &
+./usernotify $HOST $PORT &
 echo Server started

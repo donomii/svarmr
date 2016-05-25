@@ -7,6 +7,9 @@ go build svarmrMdnsWatcher.go &
 go build mDNSprocessor.go &
 go build svarmrMessage.go &
 go build moduleStarter.go &
+go build pitchWrapper.go &
+go build pitchProcessor.go &
+go build noteProcessor.go &
 gcc monitor.c -Os -flto -omonitorc &
 cd pitchDetect && gcc -l PortAudio pitchDetect.c -o pitchDetect &
 wait

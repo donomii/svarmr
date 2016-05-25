@@ -21,10 +21,10 @@ func main() {
     arg := os.Args[3]
     m := svarmrgo.Message{ Selector: "heartbeat", Arg: arg}
     out, _ := json.Marshal(m)
-    fmt.Printf("%s\r\n", out)
+    fmt.Printf("%s\n", out)
     go svarmrgo.HandleInputs(conn, handleMessage)
     for {
-	    fmt.Fprintf(conn, fmt.Sprintf("%s\n", out))
+	    svarmrgo.RespondWith(conn, m)
 	    time.Sleep(1000 * time.Millisecond)
 	}
 }

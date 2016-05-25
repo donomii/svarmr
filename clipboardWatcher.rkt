@@ -8,7 +8,7 @@
 (define-values (in out) (tcp-connect "localhost" 4816))
 
 (define process-port (lambda (a-port)
-                       [let [[line (read-line a-port 'return-linefeed)]]
+                       [let [[line (read-line a-port 'linefeed)]]
                          [displayln [string->jsexpr line]]
                          [process-port a-port]]))
 
@@ -47,7 +47,7 @@
         (hash-set! ht 'Selector "clipboard-change")
         (hash-set! ht 'Arg clip-data)
         [display [jsexpr->string ht] out]
-        [display [format "~a~a" #\return #\newline] out]
+        [display [format "~a" #\newline] out]
         [flush-output out]
       ;[write [string-ref clip-data 0]]
       

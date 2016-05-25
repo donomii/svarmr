@@ -50,3 +50,18 @@ Each module can transmit and receive any events it pleases, but it is useful to 
 * relay             - Connects two computers (network bus)
 
 
+## Dependencies
+
+Svarmr relies on a lot of other projects to provide cross platform features.  They are
+
+* Notifu - Popup messages on windows
+    * https://www.paralint.com/projects/notifu/download.html
+* Autohotkey - Intercept keys, and insert keys
+    * http://autohotkey.com
+
+* Deluge - Download torrents (linux)
+    * http://deluge-torrent.org/
+* SyntaxNet - Sentence tagging
+    * https://github.com/tensorflow/models/tree/master/syntaxnet
+
+

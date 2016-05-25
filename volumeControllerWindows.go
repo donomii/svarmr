@@ -34,8 +34,8 @@ func handleConnection (conn net.Conn) {
                          case "reveal-yourself" :
                             response := Message{Selector: "announce", Arg: "Windows volume control"}
                             out, _ := json.Marshal(response)
-                            fmt.Printf("%s\r\n", out)
-                            fmt.Fprintf(conn, fmt.Sprintf("%s\r\n", out))
+                            fmt.Printf("%s\n", out)
+                            svarmrgo.RespondWith(conn, out)
                          case "set-volume" :
                                 fmt.Printf("Volume up\n")
                                 cmd := exec.Command("osascript",  "-e", fmt.Sprintf("set volume output volume %v --100%", m.Arg))
