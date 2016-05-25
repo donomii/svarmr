@@ -32,7 +32,7 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) string{
 }
 
 func l (conn net.Conn, k string) {
-            cmd := exec.Command("sendkey.ahk", k)
+            cmd := exec.Command("c:\\Program Files\\AutoHotkey\\AutoHotkey","sendkey.ahk", k)
             runCommand(cmd,  strings.NewReader(""))
 }
 
@@ -51,9 +51,9 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     l(conn, "j")
                 case "B2" :
                     l(conn, "k")
-                case "C2" :
+                case "C3" :
                     l(conn, "l")
-                case "C#2" :
+                case "C#3" :
                     l(conn, "i")
             }
     }

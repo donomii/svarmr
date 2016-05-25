@@ -50,6 +50,6 @@ func main() {
         if err != nil {
             fmt.Printf("Could not connect to server!")
         }
-        handleInputs(conn)
+ svarmrgo.HandleInputs(conn, handleMessage)
     }
 }
