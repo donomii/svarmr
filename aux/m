@@ -1,0 +1,2 @@
+#!/bin/sh
+svarmrMessage localhost 4816 user-notify $1
