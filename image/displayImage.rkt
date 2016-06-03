@@ -4,7 +4,7 @@
 (define-values (in out) (tcp-connect "localhost" 4816))
 
 
-[define scale 2.0]
+[define scale 8.0]
 (define bitmap #f)
 
 (define f #f)
@@ -29,11 +29,17 @@
                        [letrec [[line (read-line a-port 'linefeed)]
                                 [h [string->jsexpr line]]]
                          [when [not [equal? line ""]]
-                           [when [equal? "snapshot" [hash-ref h 'Selector]]
+                           [if [or [equal? "snapshot" [hash-ref h 'Selector]]
+                                     [equal? "image" [hash-ref h 'Selector]]
+                                     ]
+                               [begin
+                             [display "Displaying image"]
                              [delete-file "temp_pic.jpg"]
                              (display-to-file (base64-decode [string->bytes/utf-8 [hash-ref h 'Arg]]) "temp_pic.jpg")
-                             [thread new-picture]]]
-                         [sleep 0.01]
+                             [thread new-picture]
+                             ]
+                               [sleep 0.1]]]
+                         
                          [process-port a-port]]))
 
 

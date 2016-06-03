@@ -24,6 +24,7 @@ cd ..
 cd image
 go build snapShot.go &
 go build recogniser.go &
+go build broadcastImage.go &
 cd ..
 
 cd clipboard
