@@ -8,12 +8,9 @@ import (
     "bytes"
     "time"
     "strings"
+    "github.com/donomii/svarmrgo"
 )
 
-type Message struct {
-    Selector string
-    Arg string
-}
 
 func handleConnection (conn net.Conn) {
     fmt.Sprintf("%V", conn)
@@ -24,7 +21,7 @@ func handleConnection (conn net.Conn) {
         if (l!="") {
                 var text = l
                 fmt.Printf("%v\n", text)
-                var m Message
+                var m svarmrgo.Message
                 err := json.Unmarshal([]byte(text), &m)
                 if err != nil {
                     fmt.Println("error:", err)
@@ -32,10 +29,10 @@ func handleConnection (conn net.Conn) {
                     fmt.Printf("%v", m)
                     switch m.Selector {
                          case "reveal-yourself" :
-                            response := Message{Selector: "announce", Arg: "Windows volume control"}
+                            response := svarmrgo.Message{Selector: "announce", Arg: "Windows volume control"}
                             out, _ := json.Marshal(response)
                             fmt.Printf("%s\n", out)
-                            svarmrgo.RespondWith(conn, out)
+                            svarmrgo.RespondWith(conn, response)
                          case "set-volume" :
                                 fmt.Printf("Volume up\n")
                                 cmd := exec.Command("osascript",  "-e", fmt.Sprintf("set volume output volume %v --100%", m.Arg))

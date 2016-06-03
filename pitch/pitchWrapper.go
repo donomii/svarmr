@@ -41,7 +41,7 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
 func main() {
     conn := svarmrgo.CliConnect()
     go svarmrgo.HandleInputs(conn, handleMessage)
-    cmd := exec.Command("pitchDetect/pitchDetect")
+    cmd := exec.Command("detect/pitchDetect")
     stdout, _ := cmd.StdoutPipe()
     cmd.Start()
     r := bufio.NewReader(stdout)

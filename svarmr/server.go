@@ -17,10 +17,10 @@ type connection struct {
 
 var connList []net.Conn
 
-func writeMessage (c connection) {
+func writeMessage (c net.Conn, m string) {
                         w := bufio.NewWriter(c)
-                        w.Write([]byte(m.raw))
-                        w.Write([]byte("\n"))
+                        w.Write([]byte(m))
+                        //w.Write([]byte("\n"))
                         w.Flush()
                     }
 
@@ -30,7 +30,7 @@ func broadcast(Q chan connection) {
             inMessages++
             for _, c := range connList {
                 if ( c != nil && c != m.port) {
-                    go writeMessage(c) //FIXME use proper output queues so we can drop misbehaving clients
+                    go writeMessage(c,m.raw) //FIXME use proper output queues so we can drop misbehaving clients
                         outMessages++
                 }
             }

@@ -47,7 +47,6 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     l(conn, m.Arg)
             }
     }
-}
 
 
 

@@ -61,6 +61,10 @@ Svarmr relies on a lot of other projects to provide cross platform features.  Th
 
 * Deluge - Download torrents (linux)
     * http://deluge-torrent.org/
+* fswatch - Detect filesystem changes
+    * https://github.com/emcrisostomo/fswatch
+* imagesnap - Take a picture
+    * http://iharder.sourceforge.net/current/macosx/imagesnap/
 * SyntaxNet - Sentence tagging
     * https://github.com/tensorflow/models/tree/master/syntaxnet
 

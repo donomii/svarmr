@@ -27,7 +27,7 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
                          case "reveal-yourself" :
                             svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "system monitor"})
                         default :
-                            fmt.Printf("%v:%v\n", m.Selector, m.Arg)
+                            fmt.Printf("%v:%v:%v\n", m.Selector, m.Arg, m.NamedArgs)
                     }
                 }
 
