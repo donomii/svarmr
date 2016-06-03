@@ -5,5 +5,5 @@ export PORT=4816
 ./svarmrMessage $HOST $PORT start-module svarmrMdnsWatcher  &
 ./svarmrMessage $HOST $PORT start-module mDNSprocessor  &
 sleep 1
-./svarmrMessage $HOST $PORT user-notify "All modules loaded"
+./svarmrMessage $HOST $PORT user-notify "All core modules loaded"
 ./monitor $HOST $PORT

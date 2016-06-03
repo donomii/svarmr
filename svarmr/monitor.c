@@ -32,8 +32,8 @@ Compile with gcc monitor.c -Os -flto -lWs2_32
 
 #endif
 
-#include "../../udp/json-parser/json.h"
-#include "../../udp/json-parser/json.c"
+#include "../aux/udp/json-parser/json.h"
+#include "../aux/udp/json-parser/json.c"
 
 
 typedef struct {

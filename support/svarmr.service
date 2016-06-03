@@ -5,6 +5,6 @@
   <service>
     <type>_svarmr._tcp</type>
     <port>4816</port>
-    <txt-record></txt-record>
+    <txt-record>Svarmr service</txt-record>
   </service>
 </service-group>
