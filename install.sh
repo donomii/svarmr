@@ -1,5 +1,5 @@
 TARGET=/usr/local/bin/
 cp svarmr/svarmrMessage $TARGET &
 cp svarmr/usernotify $TARGET &
-cp aux/m $TARGET &
+cp support/m $TARGET &
 wait
