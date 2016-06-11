@@ -36,7 +36,7 @@ func quickCommand (cmd *exec.Cmd) string{
 func doRecognise (conn net.Conn, m svarmrgo.Message ) {
             pic, _ := base64.StdEncoding.DecodeString(m.Arg)
             ioutil.WriteFile("/tmp/temp_picture_for_recogniser.jpg", pic, 0777)
-            cmd := exec.Command("aux/recognise.sh", "/tmp/temp_picture_for_recogniser.jpg")
+            cmd := exec.Command("support/recognise.sh", "/tmp/temp_picture_for_recogniser.jpg")
             answer := quickCommand(cmd)
             svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "image-recognised", Arg: answer})
     

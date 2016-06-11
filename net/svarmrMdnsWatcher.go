@@ -7,7 +7,6 @@ import (
     "github.com/donomii/svarmrgo"
     "time"
 "net"
-"os"
 "math/rand"
  "github.com/hashicorp/mdns"
 )
@@ -82,20 +81,6 @@ func externalIP() (net.IP, error) {
     return nil, errors.New("are you connected to the network?")
 }
 
-func advertiseDNS () {
-    // Setup our service export
-    host, _ := os.Hostname()
-    info := []string{"Svarmr network control bus"}
-    ip, _ := externalIP()
-    fmt.Printf("External IP: %v\n", ip)
-    service, err := mdns.NewMDNSService(host, "_svarmr._tcp.", "", fmt.Sprintf("%v.local.", host), 4816, []net.IP{ip}, info)
-    fmt.Printf("Error: %v\n", err)
-
-    // Create the mDNS server, defer shutdown
-    server, _ = mdns.NewServer(&mdns.Config{Zone: service})
-}
-
-
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
      switch m.Selector {
         case "reveal-yourself" :
@@ -115,7 +100,6 @@ func main() {
            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv6", Arg: fmt.Sprintf("%v:%v", entry.AddrV6, entry.Port)})
         }
     }()
-    advertiseDNS()
     for{
         time.Sleep(12000 * time.Millisecond)
     }
