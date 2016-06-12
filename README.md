@@ -13,9 +13,9 @@ Svarmr is a simple message bus that is super easy to write new modules for.
 
 Simple modules can be a few lines long, and there are examples in Go, Racket, Perl, and C.
 
-## Useful modules
+## Features
 
-Svarmr already has some useful modules, to do things like monitor clipboard changes, report mDNS events and broadcast keys.
+Svarmr already has some useful modules, that monitor clipboard changes, respond to keys, speak text, and detect notes.
 
 ## Design
 
@@ -37,20 +37,27 @@ Each module can transmit and receive any events it pleases, but it is useful to 
 * volume            - Sets the volume (needs helpers)
 * userNotify        - Pops up a message on the screen (needs helpers)
 * moduleStarter     - launches other modules
+* imgdisplay        - Displays an image
 
 #### Processors
 
 * clipboardProcessor- Choose an action based on clipboard contents
 
+#### Pitch
 
-#### Other
+* detect/pitchDetect    - Listens on the microphone and outputs note pitch
+* pitchWrapper      - Wraps pitchDetect
+* pitchProcessor    - Filters pitch results and outputs notes
+* noteKeyboard      - Turns notes into keypresses and sends them to the active window
+
+#### Misc
 
 * server            - The message bus daemon
 * svarmr.server     - Avahi service definition file
 * relay             - Connects two computers (network bus)
 
 
-## Dependencies
+## Helpers
 
 Svarmr relies on a lot of other projects to provide cross platform features.  They are
 
