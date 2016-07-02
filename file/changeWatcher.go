@@ -40,7 +40,7 @@ func l (conn net.Conn, k string) {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
+            m.Respond(conn, svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
             case "shutdown" :
             os.Exit(0)
     }
@@ -53,7 +53,7 @@ func watchOutput (conn net.Conn, b *bytes.Buffer) {
                 fmt.Println(err)
             }
             if (len(line)>0) {
-                svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "fs-change", Arg: line})
+                svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "fs-change", Arg: line})
             } else {
                 time.Sleep(1000 * time.Millisecond)
             }

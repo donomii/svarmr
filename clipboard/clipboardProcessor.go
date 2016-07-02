@@ -25,15 +25,14 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) bytes.Buffer{
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     switch m.Selector {
                          case "reveal-yourself" :
-								                   svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
-                                 case "shutdown" :
-                                           os.Exit(0)
-
+                               m.Respond(conn, svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
+                         case "shutdown" :
+                               os.Exit(0)
                          case "clipboard-change" :
 								if match, _ := regexp.MatchString("magnet", m.Arg); match {
-									svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "add-torrent", Arg: m.Arg})
+									m.Respond(conn, svarmrgo.Message{Selector: "add-torrent", Arg: m.Arg})
 								} else {
-									svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "user-notify-error", Arg: m.Arg})
+									m.Respond(conn, svarmrgo.Message{Selector: "user-notify-error", Arg: m.Arg})
 								}
                     }
                 }

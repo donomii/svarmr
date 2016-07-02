@@ -29,7 +29,7 @@ while ( my $line = <$sock> ) {
     my $s = {Selector => "Decode failed"};
     eval { $s = decode_json($line)};
     #print "** ".$s->{Selector}." **\n\n".$s->{Arg}."\n\n\n";
-    if ($s->{Selector} eq "get-config") {
+    if ($s->{Selector} eq "get-all-config") {
         print newMessage("config", "", readConfig())."!\n";
         print $sock newMessage("config", "", readConfig())."\n";
     }

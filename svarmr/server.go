@@ -1,3 +1,8 @@
+//The message hub.  Server relays messages between programs
+//
+//Start with
+//
+//    server localhost 4816
 package main
 import (
     "net"
@@ -47,7 +52,7 @@ func handleConnection (conn net.Conn, Q chan connection) {
             //for scanner.Scan() {
 				t,err := reader.ReadString('\n')
 				if err != nil {
-                        fmt.Println("Client disconnected: ", err)
+                        //fmt.Println("Client disconnected: ", err)
                         return
 				}
                 var m connection = connection{ conn, t }
@@ -69,7 +74,7 @@ func main() {
     }
     for {
         conn, err := ln.Accept()
-        fmt.Println("Client connected")
+        //fmt.Println("Client connected")
         if err != nil {
             // handle error
         }
