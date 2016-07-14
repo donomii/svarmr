@@ -12,6 +12,7 @@ cd net
 go build relay.go &
 go build mDNSprocessor.go &
 go build svarmrMdnsWatcher.go &
+go build svarmrMdnsAdvertiser.go &
 cd ..
 
 cd pitch
@@ -35,6 +36,7 @@ cd misc
 go build volume.go &
 go build insertKey.go &
 go build volumeControllerWindows.go &
+go build torrentListener.go &
 cd ..
 
 
