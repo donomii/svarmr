@@ -4,8 +4,7 @@
 (require json)
 (define-values (in out) (tcp-connect "localhost" 4816))
 
-
-[define scale 4.0]
+[define scale 8.0]
 (define bitmap #f)
 [define do-resize #f]
 
@@ -13,7 +12,7 @@
 
 
 [define viewer-frame% (class frame%
- 
+
   (super-new)                ; superclass initialization
 
 [define/override on-size [lambda [width height]
@@ -38,28 +37,38 @@
     [when do-resize [displayln "Resizing"]
                       [set! bitmap (read-bitmap "temp_pic.jpg" )]
                        [let [[new-scale [/   [send  bitmap get-width] [send f get-width]]]]
-                           
+
                            [set! scale new-scale]
                          [displayln scale]
                       [set! bitmap (read-bitmap "temp_pic.jpg" #:backing-scale scale)]
                       ;[send bitmap load-file "temp_pic.jpg"]
                       [send mess set-label bitmap]
-                      (send f resize
-                             [send  bitmap get-width]
-                            [send  bitmap get-height])	]] 
+                      ;(send f resize [inexact->exact [* [/ 1.0 1.0] [send  bitmap get-width]]][inexact->exact [* [/ 1.0 1.0] [send  bitmap get-height]]])
+]
+    [set! do-resize #f]
+      ]]]
+
+[define new-picture [lambda [scale]
+                      [when do-resize
+                      [handle-resize scale]
+                         [send f show #t]
+                        [set! do-resize #f]]]]
 
 (define process-port (lambda (a-port)
                        [letrec [[line (read-line a-port 'linefeed)]
                                 [h [string->jsexpr line]]]
-                      
                          [when [not [equal? line ""]]
-                           [when [or [equal? "snapshot" [hash-ref h 'Selector]]
+                           [if [or [equal? "snapshot" [hash-ref h 'Selector]]
                                      [equal? "image" [hash-ref h 'Selector]]
                                      ]
+                               [begin
+                             [display "Displaying image"]
                              [delete-file "temp_pic.jpg"]
                              (display-to-file (base64-decode [string->bytes/utf-8 [hash-ref h 'Arg]]) "temp_pic.jpg")
-                             [new-picture]]]
-                         ;[sleep 1]
+                             [thread [thunk [new-picture scale]]]
+                             ]
+                               [sleep 0.1]]]
+
                          [process-port a-port]]))
 
 
@@ -69,7 +78,8 @@
 
 
 [define [mainloop]
-  ;[sleep 1]
+  [sleep 1]
   [mainloop]]
 
 ;[mainloop]
+                                                                            
