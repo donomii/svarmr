@@ -44,7 +44,7 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
 					os.Exit(0)
 				}
                          case "reveal-yourself" :
-				svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: relayID})
+				m.Respond(svarmrgo.Message{Selector: "announce", Arg: relayID})
               case "shutdown" :
                         shutdown = 1
                     }
@@ -64,10 +64,10 @@ func copyLines(c1, c2 net.Conn) {
 
 func announceMe (conn net.Conn) {
 	for {
-        svarmrgo.Debug("Outer announce loop")
-	svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: relayID})
-	time.Sleep(5000 * time.Millisecond)
-}
+		svarmrgo.Debug("Outer announce loop")
+		svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "announce", Arg: relayID})
+		time.Sleep(5000 * time.Millisecond)
+	}
 }
 
 func main() {

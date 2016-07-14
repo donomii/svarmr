@@ -43,7 +43,7 @@ func closeEnough(a, b float64) bool {
 
 func checkNote(conn net.Conn, pitch, noteHz float64, s string ) {
     if closeEnough(pitch, noteHz) {
-        svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "pitch", Arg: s})
+        svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "pitch", Arg: s})
         history[hpointer] = s
         hpointer ++
         if hpointer>2 {
@@ -51,7 +51,7 @@ func checkNote(conn net.Conn, pitch, noteHz float64, s string ) {
         }
         if history[0]==history[1] && history[0]==history[2] {
             if lastNote != s {
-                svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "note", Arg: s})
+                svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "note", Arg: s})
                 lastNote = s
             }
         }
@@ -70,7 +70,7 @@ func checkOctaves(conn net.Conn, pitch, noteHz float64, s string ) {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "mDnsProcessor"})
+            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "mDnsProcessor"})
             case "shutdown" :
             os.Exit(0)
 

@@ -9,9 +9,7 @@
 //will cause svarmr to pop up a hello message.
 package main
 import (
-    "fmt"
     "os"
-    "encoding/json"
     "github.com/donomii/svarmrgo"
 )
 

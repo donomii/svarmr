@@ -38,14 +38,14 @@ func doRecognise (conn net.Conn, m svarmrgo.Message ) {
             ioutil.WriteFile("/tmp/temp_picture_for_recogniser.jpg", pic, 0777)
             cmd := exec.Command("support/recognise.sh", "/tmp/temp_picture_for_recogniser.jpg")
             answer := quickCommand(cmd)
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "image-recognised", Arg: answer})
+            m.Respond(svarmrgo.Message{Selector: "image-recognised", Arg: answer})
     
 }
 
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
+            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
             case "shutdown" :
             os.Exit(0)
          case "snapshot" :

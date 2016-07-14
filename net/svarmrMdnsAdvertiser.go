@@ -92,7 +92,7 @@ func advertiseDNS () {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
      switch m.Selector {
         case "reveal-yourself" :
-           svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "svarmrMdnsAdvertiser"})
+           m.Respond(svarmrgo.Message{Selector: "announce", Arg: "svarmrMdnsAdvertiser"})
       }
 }
 

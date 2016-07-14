@@ -32,7 +32,7 @@ type NotifyArgs struct {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     switch m.Selector {
                          case "reveal-yourself" :
-			        svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
+			        m.Respond(svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
                     }
                 }
 
@@ -47,7 +47,7 @@ func main() {
     r := bufio.NewReader(stdout)
     for {
         line, _, _ := r.ReadLine()
-        svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "pitch-detect", Arg: string(line)})
+        svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "pitch-detect", Arg: string(line)})
         //fmt.Println(string(line))
     }
 }

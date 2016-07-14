@@ -31,7 +31,7 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) string{
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "mDnsProcessor"})
+            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "mDnsProcessor"})
             case "shutdown" :
             os.Exit(0)
 

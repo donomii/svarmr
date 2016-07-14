@@ -36,7 +36,7 @@ func quickCommand (cmd *exec.Cmd) string{
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
+            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
          case "shutdown" :
             os.Exit(0)
          case "take-picture" :
@@ -48,5 +48,5 @@ func main() {
     filename := os.Args[3]
     pic, _ := ioutil.ReadFile(filename)
     enc_pic := base64.StdEncoding.EncodeToString(pic)
-    svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "image", Arg: enc_pic})
+    svarmrgo.SendMessage(conn,svarmrgo.Message{Selector: "image", Arg: enc_pic})
 }

@@ -39,7 +39,7 @@ func l (conn net.Conn, k string) {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
+            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "noteProcessor"})
             case "shutdown" :
             os.Exit(0)
 

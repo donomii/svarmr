@@ -6,7 +6,7 @@ import (
     "os"
     "os/exec"
     "bytes"
-	"io"
+    "io"
     "github.com/donomii/svarmrgo"
     "fmt"
 )
@@ -39,7 +39,7 @@ func l (conn net.Conn, k string) {
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "insertKey"})
+            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "insertKey"})
             case "shutdown" :
             os.Exit(0)
 

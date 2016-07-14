@@ -1,7 +1,7 @@
 cd svarmr
 go build server.go &
 go build heartBeat.go &
-gcc monitor.c -Os -flto -omonitorc &
+gcc monitor.c -Os -flto -lm -omonitorc &
 go build monitor.go &
 go build svarmrMessage.go &
 go build usernotify.go &
@@ -18,7 +18,7 @@ cd pitch
 go build pitchWrapper.go &
 go build pitchProcessor.go &
 go build noteKeyboard.go &
-cd detect && gcc -l PortAudio pitchDetect.c -o pitchDetect &
+cd detect && gcc -lm -lportaudio pitchDetect.c -o pitchDetect &
 cd ..
 
 cd image

@@ -15,7 +15,7 @@ func handleMessage (conn net.Conn, m svarmrgo.Message) {
                 response := svarmrgo.Message{Selector: "announce", Arg: "MacOSX volume control"}
                 out, _ := json.Marshal(response)
                 fmt.Printf("%sr\n", out)
-                svarmrgo.RespondWith(conn, response)
+                m.Respond(response)
          case "set-volume" :
                 fmt.Printf("Volume up\n")
                 cmd := exec.Command("osascript",  "-e", fmt.Sprintf("set volume output volume %v --100%", m.Arg))

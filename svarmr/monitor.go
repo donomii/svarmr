@@ -25,7 +25,7 @@ func runCommand (cmd *exec.Cmd, stdin io.Reader) bytes.Buffer{
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
                     switch m.Selector {
                          case "reveal-yourself" :
-                            m.Respond(conn, svarmrgo.Message{Selector: "announce", Arg: "system monitor"})
+                            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "message monitor"})
                         default :
                             fmt.Printf("%v:%v:%v\n", m.Selector, m.Arg, m.NamedArgs)
                     }
