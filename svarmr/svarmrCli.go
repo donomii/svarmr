@@ -44,6 +44,16 @@ func cli(conn net.Conn) {
                 fmt.Println(err)
                 os.Exit(0)
             }
+            if cmd[0] == "n" || cmd[0] == "namedargs" {
+                selector := cmd[1]
+                args := make(map[string]string)
+                for i:=2; i<len(cmd)-1; i+=2 {
+                    args[cmd[i]] = cmd[i+1]
+                }
+                msg := svarmrgo.Message{Selector: selector, NamedArgs: args}
+                fmt.Printf("Sending: %v\n", msg)
+                svarmrgo.SendMessage(conn, msg)
+            }
             if cmd[0] == "b" || cmd[0] == "broadcast" {
                 selector := cmd[1]
                 arg := cmd[2]

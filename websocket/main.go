@@ -29,12 +29,12 @@ func main() {
 }
 
 func handleMessage (conn net.Conn, m svarmrgo.Message) {
-    server.SendAll(&chat.Message{Author: m.Selector, Body: m.Arg})
+    server.SendAll(&chat.Message{Selector: m.Selector, Arg: m.Arg, NamedArgs: m.NamedArgs})
     switch m.Selector {
          case "reveal-yourself" :
-            svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "announce", Arg: "system monitor"})
+            svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "announce", Arg: "system monitor"})
         default :
-            fmt.Printf("%v:%v:%v\n", m.Selector, m.Arg, m.NamedArgs)
+            fmt.Printf("svarmr: %v:%v:%v\n", m.Selector, m.Arg, m.NamedArgs)
     }
 }
 
