@@ -5,12 +5,15 @@
 //    server localhost 4816
 package main
 import (
+    "log"
     "net"
     "bufio"
     "fmt"
 	"os"
 
 )
+
+const queueLength int = 1
 
 var inMessages int = 0
 var outMessages int = 0
@@ -27,17 +30,18 @@ func writeMessage (c net.Conn, m string) {
                         w.Write([]byte(m))
                         //w.Write([]byte("\n"))
                         w.Flush()
+                        log.Println("Message sent, buffer at ", 
                     }
 
 func broadcast(Q chan connection) {
     for {
             m := <- Q
             inMessages++
-            for _, c := range connList {
-                if ( c != nil && c != m.port) {
-                    go writeMessage(c,m.raw) //FIXME use proper output queues so we can drop misbehaving clients
-                        outMessages++
-                }
+            for _, c := range outQs {
+                //FIXME don't send back to the originator
+                //if ( c.raw != nil && c.port != m.port) {
+                    c <- m
+                //}
             }
         }
 }
@@ -63,15 +67,34 @@ func handleConnection (conn net.Conn, Q chan connection) {
 
 }
 
+var outQs []chan connection
+
+
+func outWorker(c net.Conn, outQ chan connection) {
+    for {
+            m := <- outQ
+            outMessages++
+                if ( c != nil && c != m.port) {
+                    go writeMessage(c,m.raw) //FIXME use proper output queues so we can drop misbehaving clients
+                    outMessages++
+            }
+        }
+}
+
+
+
 func main() {
+    log.Println("Initialising...")
     connList = make([]net.Conn,0)
-    inQ := make(chan connection, 200)
+    inQ := make(chan connection, queueLength)
     go broadcast(inQ)
+    log.Println("Input queue started")
     ln, err := net.Listen("tcp", "0.0.0.0:4816")
     if err != nil {
           fmt.Printf("Couldn't open port 4816")
 		      os.Exit(1)
     }
+    log.Println("Listening on 0.0.0.0:4816")
     for {
         conn, err := ln.Accept()
         //fmt.Println("Client connected")
@@ -79,6 +102,10 @@ func main() {
             // handle error
         }
         connList = append(connList, conn)
+        outQ := make(chan connection, queueLength)
+        outQs = append(outQs, outQ)
         go handleConnection(conn, inQ)
+        go outWorker(conn, outQ)
+        log.Println("Accepted incoming connection")
     }
 }
