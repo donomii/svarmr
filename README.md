@@ -1,6 +1,6 @@
 # svarmr
 
-A networked control bus and messaging system
+A networked control bus and messaging system, with many useful modules
 
 * Link the volume on all your devices
 * Automatically start torrents on a different machine
