@@ -55,6 +55,11 @@ func handleSubprocConnection(conn *subProx, Q chan connection) {
 }
 
 func StartSubproc(cmd string, args []string) subProx {
+	if _, err := os.Stat(cmd); os.IsNotExist(err) {
+		//out = append(out, svarmrgo.Message{"error", "Can't find notifu.exe at " + notifu_path})
+		cmd = fmt.Sprintf("%s.exe", cmd)
+	}
+
 	grepCmd := exec.Command(cmd, args...)
 
 	grepIn, _ := grepCmd.StdinPipe()
@@ -175,7 +180,6 @@ func start_network() {
 	}
 }
 */
-
 
 func main() {
 	inQ = make(chan connection, 200)
