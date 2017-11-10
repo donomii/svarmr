@@ -128,7 +128,7 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 	*/
 	case "start-module":
 		go StartSubproc(m.Arg, []string{"pipes"})
-		go StartSubproc(fmt.Sprintf("%v.exe", m.Arg), []string{"pipes"})
+		//go StartSubproc(fmt.Sprintf("%v.exe", m.Arg), []string{"pipes"})
 	case "debug":
 		log.Println(m.Arg)
 	case "log":
