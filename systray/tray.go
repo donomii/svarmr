@@ -9,7 +9,7 @@ import (
 	"github.com/donomii/svarmrgo"
 	"github.com/getlantern/systray"
 	"github.com/getlantern/systray/example/icon"
-	"github.com/skratchdot/open-golang/open"
+	//"github.com/skratchdot/open-golang/open"
 )
 
 func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
@@ -68,64 +68,67 @@ func onReady() {
 		systray.SetIcon(icon.Data)
 		systray.SetTitle("Awesome App")
 		systray.SetTooltip("Tooltray title")
-		item := systray.AddMenuItem("Reveal Modules", "Force all modules to announce themselves")
-		item1 := systray.AddMenuItem("Launch Modules", "Show module launcher")
-		mChange := systray.AddMenuItem("Change Me", "Change Me")
-		mChecked := systray.AddMenuItem("Unchecked", "Check Me")
-		mEnabled := systray.AddMenuItem("Enabled", "Enabled")
-		systray.AddMenuItem("Ignored", "Ignored")
-		mUrl := systray.AddMenuItem("Open Lantern.org", "my home")
+		//item := systray.AddMenuItem("Reveal Modules", "Force all modules to announce themselves")
+		//item1 := systray.AddMenuItem("Launch Modules", "Show module launcher")
+		//mChange := systray.AddMenuItem("Change Me", "Change Me")
+		//mChecked := systray.AddMenuItem("Unchecked", "Check Me")
+		//mEnabled := systray.AddMenuItem("Enabled", "Enabled")
+		//systray.AddMenuItem("Ignored", "Ignored")
+		//mUrl := systray.AddMenuItem("Open Lantern.org", "my home")
 		mQuit := systray.AddMenuItem("ÚÇÇÕç║", "Quit the whole app")
 		systray.AddSeparator()
-		mToggle := systray.AddMenuItem("Toggle", "Toggle the Quit button")
+		//mToggle := systray.AddMenuItem("Toggle", "Toggle the Quit button")
 
-		go func() {
-			for {
-				_ = <-item.ClickedCh
-				//mChange.SetTitle("I've Changed")
-				svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "reveal-yourself", Arg: ""})
-			}
-		}()
+		/*
+			go func() {
+				for {
+					_ = <-item.ClickedCh
+					//mChange.SetTitle("I've Changed")
+					svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "reveal-yourself", Arg: ""})
+				}
+			}()
 
-		go func() {
-			for {
-				_ = <-item1.ClickedCh
-				//mChange.SetTitle("I've Changed")
-				svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "start-module", Arg: "gui/gui"})
-			}
-		}()
-
-		shown := true
+			go func() {
+				for {
+					_ = <-item1.ClickedCh
+					//mChange.SetTitle("I've Changed")
+					svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "start-module", Arg: "gui/gui"})
+				}
+			}()
+		*/
+		//shown := true
 		svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "ModuleStart", Arg: "systray"})
 		svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "TrayStart", Arg: "systray"})
 
 		for {
 			select {
-			case <-mChange.ClickedCh:
-				mChange.SetTitle("I've Changed")
-			case <-mChecked.ClickedCh:
-				if mChecked.Checked() {
-					mChecked.Uncheck()
-					mChecked.SetTitle("Unchecked")
-				} else {
-					mChecked.Check()
-					mChecked.SetTitle("Checked")
-				}
-			case <-mEnabled.ClickedCh:
-				mEnabled.SetTitle("Disabled")
-				mEnabled.Disable()
-			case <-mUrl.ClickedCh:
-				open.Run("https://www.getlantern.org")
-			case <-mToggle.ClickedCh:
-				if shown {
-					mQuitOrig.Hide()
-					mEnabled.Hide()
-					shown = false
-				} else {
-					mQuitOrig.Show()
-					mEnabled.Show()
-					shown = true
-				}
+			/*
+				case <-mChange.ClickedCh:
+					mChange.SetTitle("I've Changed")
+				case <-mChecked.ClickedCh:
+					if mChecked.Checked() {
+						mChecked.Uncheck()
+						mChecked.SetTitle("Unchecked")
+					} else {
+						mChecked.Check()
+						mChecked.SetTitle("Checked")
+					}
+				case <-mEnabled.ClickedCh:
+					mEnabled.SetTitle("Disabled")
+					mEnabled.Disable()
+				case <-mUrl.ClickedCh:
+					open.Run("https://www.getlantern.org")
+				case <-mToggle.ClickedCh:
+					if shown {
+						mQuitOrig.Hide()
+						mEnabled.Hide()
+						shown = false
+					} else {
+						mQuitOrig.Show()
+						mEnabled.Show()
+						shown = true
+					}
+			*/
 			case <-mQuit.ClickedCh:
 				systray.Quit()
 				fmt.Println("Quit2 now...")
