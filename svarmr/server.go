@@ -4,81 +4,171 @@
 //
 //    server localhost 4816
 package main
-import (
-    "net"
-    "bufio"
-    "fmt"
-	"os"
 
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+	"time"
+
+	"github.com/donomii/svarmrgo"
 )
 
 var inMessages int = 0
 var outMessages int = 0
 
 type connection struct {
-    port net.Conn
-    raw string
+	port   net.Conn
+	handle *subProx
+	raw    string
+}
+
+type subProx struct {
+	In  io.WriteCloser
+	Out io.ReadCloser
+	Err io.ReadCloser
+	Cmd *exec.Cmd
+}
+
+//Read incoming messages and place them on the input queue
+func handleSubprocConnection(conn *subProx, Q chan connection) {
+
+	reader := bufio.NewReader(conn.Out)
+
+	for {
+		t, err := reader.ReadString('\n')
+		if err != nil {
+			//fmt.Println("Client disconnected: ", err)
+			return
+		}
+		var m connection = connection{nil, conn, t}
+		Q <- m
+	}
+
+}
+
+func StartSubproc(cmd string, args []string) subProx {
+	grepCmd := exec.Command(cmd, args...)
+
+	grepIn, _ := grepCmd.StdinPipe()
+	grepOut, _ := grepCmd.StdoutPipe()
+	//Err, _ := grepCmd.StderrPipe()
+
+	grepCmd.Start()
+	p := subProx{grepIn, grepOut, nil, grepCmd}
+	subprocList = append(subprocList, &p)
+	go handleSubprocConnection(&p, inQ)
+	inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "user-notify", Arg: "Service started: " + cmd})}
+	return p
+	//grepIn.Write([]byte("hello grep\ngoodbye grep"))
+	//grepIn.Close()
+	//grepBytes, _ := ioutil.ReadAll(grepOut)
+	//grepCmd.Wait()
 }
 
 var connList []net.Conn
+var subprocList []*subProx
 
-func writeMessage (c net.Conn, m string) {
-                        w := bufio.NewWriter(c)
-                        w.Write([]byte(m))
-                        //w.Write([]byte("\n"))
-                        w.Flush()
-                    }
-
-func broadcast(Q chan connection) {
-    for {
-            m := <- Q
-            inMessages++
-            for _, c := range connList {
-                if ( c != nil && c != m.port) {
-                    go writeMessage(c,m.raw) //FIXME use proper output queues so we can drop misbehaving clients
-                        outMessages++
-                }
-            }
-        }
+func writeMessage(c net.Conn, m string) {
+	w := bufio.NewWriter(c)
+	w.Write([]byte(m))
+	//w.Write([]byte("\n"))
+	w.Flush()
 }
 
+func broadcast(Q chan connection) {
+	for {
+		m := <-Q
+		inMessages++
+		for _, c := range connList {
+			if c != nil && c != m.port {
+				go writeMessage(c, m.raw) //FIXME use proper output queues so we can drop misbehaving clients
+				outMessages++
+			}
+		}
+
+		for _, c := range subprocList {
+			if c != nil && c != m.handle {
+				go c.In.Write([]byte(m.raw)) //FIXME use proper output queues so we can drop misbehaving clients
+				outMessages++
+			}
+		}
+
+	}
+}
+
+func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
+	switch m.Selector {
+	case "reveal-yourself":
+		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "announce", Arg: "spine"})}
+	case "start-module":
+		go StartSubproc(m.Arg, []string{"pipes"})
+	}
+	return []svarmrgo.Message{}
+}
 
 //Read incoming messages and place them on the input queue
-func handleConnection (conn net.Conn, Q chan connection) {
-    //scanner := bufio.NewScanner(conn)
+func handleConnection(conn net.Conn, Q chan connection) {
+	//scanner := bufio.NewScanner(conn)
 	reader := bufio.NewReader(conn)
 
-    for {
-            //for scanner.Scan() {
-				t,err := reader.ReadString('\n')
-				if err != nil {
-                        //fmt.Println("Client disconnected: ", err)
-                        return
-				}
-                var m connection = connection{ conn, t }
-                Q <- m
-				//time.Sleep(time.Millisecond * 200)
-        //}
-    }
+	for {
+		//for scanner.Scan() {
+		t, err := reader.ReadString('\n')
+		if err != nil {
+			//fmt.Println("Client disconnected: ", err)
+			return
+		}
+		var m connection = connection{conn, nil, t}
+		Q <- m
+		//time.Sleep(time.Millisecond * 200)
+		//}
+	}
 
+}
+
+var inQ chan connection
+
+func start_network() {
+	go broadcast(inQ)
+	ln, err := net.Listen("tcp", "0.0.0.0:4816")
+	if err != nil {
+		fmt.Printf("Couldn't open port 4816")
+		os.Exit(1)
+	}
+	for {
+		conn, err := ln.Accept()
+		//fmt.Println("Client connected")
+		if err != nil {
+			// handle error
+		}
+		connList = append(connList, conn)
+		go handleConnection(conn, inQ)
+	}
 }
 
 func main() {
-    connList = make([]net.Conn,0)
-    inQ := make(chan connection, 200)
-    go broadcast(inQ)
-    ln, err := net.Listen("tcp", "0.0.0.0:4816")
-    if err != nil {
-          fmt.Printf("Couldn't open port 4816")
-		      os.Exit(1)
-    }
-    for {
-        conn, err := ln.Accept()
-        //fmt.Println("Client connected")
-        if err != nil {
-            // handle error
-        }
-        connList = append(connList, conn)
-        go handleConnection(conn, inQ)
-    }
+	inQ = make(chan connection, 200)
+	connList = make([]net.Conn, 0)
+	//Don't run network sockets from the server anymore, run the relay module
+	//to handle TCP socket clients
+	//go start_network()
+
+	//go StartSubproc("svarmr/clock.exe", []string{"pipes"})
+	//go StartSubproc("gui/gui.exe", []string{"pipes"})
+	for _, v := range os.Args[1:] {
+		log.Println("Starting ", v)
+		StartSubproc(v, []string{"pipes"})
+	}
+	go func() {
+		//time.Sleep(5.0 * time.Second)
+		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "user-notify", Arg: "Server started"})}
+	}()
+	for {
+		time.Sleep(1.0 * time.Second)
+	}
 }
