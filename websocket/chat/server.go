@@ -42,7 +42,7 @@ func NewServer(pattern string) *Server {
 
 func (s *Server) Add(c *Client) {
 	s.addCh <- c
-    s.sendAll(&Message{Author: "Server", Body: "Welcome new client"})
+    s.sendAll(&Message{Selector: "Server", Arg: "Welcome new client"})
 }
 
 func (s *Server) Del(c *Client) {

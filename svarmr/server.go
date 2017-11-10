@@ -6,17 +6,18 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"io"
-	"log"
-	"net"
+    "log"
+    "net"
+    "bufio"
+    "fmt"
 	"os"
 	"os/exec"
 	"time"
 
 	"github.com/donomii/svarmrgo"
 )
+
+const queueLength int = 1
 
 var inMessages int = 0
 var outMessages int = 0
@@ -72,6 +73,7 @@ func StartSubproc(cmd string, args []string) subProx {
 
 var connList []net.Conn
 var subprocList []*subProx
+
 
 func writeMessage(c net.Conn, m string) {
 	w := bufio.NewWriter(c)
@@ -171,4 +173,3 @@ func main() {
 	for {
 		time.Sleep(1.0 * time.Second)
 	}
-}

@@ -107,7 +107,7 @@ func (c *Client) listenRead() {
 			} else if err != nil {
 				c.server.Err(err)
 			} else {
-                svarmrgo.RespondWith(Conn, svarmrgo.Message{Selector: msg.Author, Arg: msg.Body})
+                svarmrgo.SendMessage(Conn, svarmrgo.Message{Selector: msg.Selector, Arg: msg.Arg})
 				c.server.SendAll(&msg)
 			}
 		}

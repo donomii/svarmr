@@ -5,69 +5,104 @@
 		<title>Sample of websocket with golang</title>
     <link rel="stylesheet" href="vender/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vender/bootstrap/css/bootstrap-responsive.min.css">
-		<script src="vender/jquery-2.1.4.min.js">
-		<script src="vender/bootstrap/js/bootstrap.min.js"></script>
-		</script>
-		<script src="vender/knockout-3.4.0.js">
-		</script>
-		<script src="vender/jquery.json-2.5.1.min.js">
-		</script>
-		<script data-main="js/main" src="vender/require.js">
-		</script>
-	</head>
+    <script src="vender/jquery-2.1.4.min.js">
+    <script src="vender/bootstrap/js/bootstrap.min.js"></script>
+    </script>
+    <script src="vender/jquery.json-2.5.1.min.js">
+    </script>
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/icon.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
+    <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+            function addElement(parentId, elementTag, elementId, html) {
+                // Adds an element to the document
+                var p = document.getElementById(parentId);
+                console.log("parent", p);
+                var newElement = document.createElement(elementTag);
+                newElement.setAttribute('id', elementId);
+                newElement.setAttribute('class', "rtitle");
+                newElement.setAttribute('region', "north");
+                newElement.innerHTML = html;
+                console.log(newElement);
+                p.appendChild(newElement);
+                console.log("element created");
+            }
+            function WebSocketTest()
+             {
+                if ("WebSocket" in window)
+                {
+                   // Let us open a web socket
+                   var ws = new WebSocket("ws://localhost:8080/entry");
+                    
+                   ws.onopen = function()
+                   {
+                      // Web Socket is connected, send data using send()
+                        console.log('Opened websocket');
+                         $('#sse').combobox({
+                            onChange:function(param){
+                                alert("click");
+                                ws.send(JSON.stringify({"Selector": "event", "Arg": "onclick"}))
+                            },
+                            required: true,
+                            valueField: 'label',
+                            textField: 'text',
+                            data:[{"label":"hello","text": "bbbb"},{"label":"goodbye", "text": "aaaa"}]
+                        });
+                   };
+                    
+                   ws.onmessage = function (evt) 
+                   {
+                        var received_msg = evt.data;
+                        var mess = JSON.parse(evt.data);
+                        console.log(mess);
+                        if (mess.Selector == 'setValue') {
+                            console.log("$('#" + mess.NamedArgs.Id + "')." + mess.NamedArgs.Element + "('setValue', "+ mess.NamedArgs.Value +");");
+                            eval("$('#" + mess.NamedArgs.Id + "')." + mess.NamedArgs.Element + "('setValue', "+ mess.NamedArgs.Value +");");
+                        }
+                   };
+                   ws.onclose = function()
+                   { 
+                      // websocket is closed.
+                   };
+                }
+                else
+                {
+                   // The browser doesn't support WebSocket
+                   alert("WebSocket NOT supported by your Browser!");
+                }
+             }
+          </script>
+        </head>
 
-	<body>
-
-	<div class="grid-row">
-
-		<div class="span3">
-		</div>
-
-		<div class="span6">
-
-			<h1>Input</h1>
-			<form class="well form-horizontal" data-bind="with: editingMessage">
-
-				<!-- Author -->
-				<div class="control-group">
-					<label class="control-label" for="inputAuthor">Author :</label>
-					<div class="controls">
-						<input id="inputAuthor" type="text" data-bind="value: author"/>
-					</div>
-				</div>
-
-				<!-- Body -->
-				<div class="control-group">
-					<label class="control-label" for="inputBody">Message :</label>
-					<div class="controls">
-						<textarea id="inputBody" data-bind="value: body">
-						</textarea>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<div class="controls">
-						<a href="#" class="btn pull-right" data-bind="click: $parent.send.bind($parent)">Send</a>
-					</div>
-				</div>
-			</form>
-
-			<h1>Messages</h1>
-			<div data-bind="foreach: messages">
-				<div>
-					<h3>
-						<!-- ko text: author --><!-- /ko -->
-						says :
-					</h3>
-					<pre data-bind="text:body">
-					</pre>
-				</div>
-			</div>
-
-		</div>
-
-		<div class="span3">
-		</div>
-
-	</body>
+<body class="easyui-layout" >
+    <div region="west" title="Channels Tree" split="true" border="false" style="width:200px;background:#EAFDFF;">
+        <ul id="t-channels" url="data/channels.json"></ul>
+    </div>
+    <div region="center" border="false">
+        <div class="easyui-layout" fit="true">
+            <div region="north" split="true" border="false" style="height:200px">
+                <table id="dg" 
+                        url="get_feed.php" border="false" rownumbers="true"
+                        fit="true" fitColumns="true" singleSelect="true">
+                    <thead>
+                        <tr>
+                            <th field="title" width="100">Title</th>
+                            <th field="description" width="200">Description</th>
+                            <th field="pubdate" width="80">Publish Date</th>
+                        </tr>
+                    </thead>
+                </table>
+<div id="p" class="easyui-progressbar" data-options="value:60" style="width:400px;"></div>
+        <div id="sse">
+            <a href="javascript:WebSocketTest()">Run WebSocket</a>
+            <input id="cc" style="width:200px" />
+        </div>
+            </div>
+            <div region="center" border="false" style="overflow:hidden">
+                <iframe id="cc" scrolling="auto" frameborder="0" style="width:100%;height:100%"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
