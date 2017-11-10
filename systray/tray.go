@@ -12,8 +12,8 @@ import (
 )
 
 func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
-	message := svarmrgo.Message{Selector: "announce", Arg: "gui"}
-	out := []svarmrgo.Message{message}
+	message := svarmrgo.Message{Selector: "announce", Arg: "systray"}
+	out := []svarmrgo.Message{}
 	switch m.Selector {
 	case "reveal-yourself":
 		out = append(out, message)
