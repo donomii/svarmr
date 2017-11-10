@@ -1,1 +1,1 @@
-START svarmr\server.exe svarmr/usernotify systray/tray
+START svarmr\server.exe svarmr/example svarmr/usernotify systray/tray
