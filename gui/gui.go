@@ -9,7 +9,7 @@ var box *ui.Box
 var greeting *ui.Label
 
 func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
-	message := svarmrgo.Message{Selector: "announce", Arg: "gui"}
+	message := svarmrgo.Message{Selector: "announce", Arg: "Module Launcher"}
 	out := []svarmrgo.Message{}
 	switch m.Selector {
 	case "reveal-yourself":
@@ -42,7 +42,7 @@ func main() {
 		box.Append(greeting, false)
 		window := ui.NewWindow("Module Launcher", 200, 100, false)
 		window.OnClosing(func(*ui.Window) bool {
-			svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "ModuleQuit", Arg: "gui"})
+			svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "ModuleQuit", Arg: "Module Launcher"})
 			ui.Quit()
 			return true
 		})
