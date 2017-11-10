@@ -22,7 +22,7 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 		//case "clock":
 		//out = append(out, m3)
 	case "TrayItemClick":
-		if m.Arg == "Module Launcher" {
+		if m.Arg == "Launch Modules" {
 			out = append(out, svarmrgo.Message{Selector: "start-module", Arg: "gui/gui"})
 		}
 
