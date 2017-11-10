@@ -6,6 +6,7 @@ import (
 )
 
 var box *ui.Box
+var greeting *ui.Label
 
 func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 	message := svarmrgo.Message{Selector: "announce", Arg: "gui"}
@@ -15,9 +16,11 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 		out = append(out, message)
 	case "gui-label":
 		ui.QueueMain(func() {
-
 			box.Append(ui.NewLabel(m.Arg), false)
 		})
+	case "tick":
+	default:
+		greeting.SetText("(" + m.Selector + ")" + m.Arg)
 	}
 	return out
 }
@@ -30,14 +33,14 @@ func main() {
 
 	err := ui.Main(func() {
 		name := ui.NewEntry()
-		button := ui.NewButton("Greet")
-		greeting := ui.NewLabel("")
+		button := ui.NewButton("Launch")
+		greeting = ui.NewLabel("")
 		box = ui.NewVerticalBox()
-		box.Append(ui.NewLabel("Enter your name:"), false)
+		box.Append(ui.NewLabel("Module path:"), false)
 		box.Append(name, false)
 		box.Append(button, false)
 		box.Append(greeting, false)
-		window := ui.NewWindow("Hello", 200, 100, false)
+		window := ui.NewWindow("Module Launcher", 200, 100, false)
 		window.OnClosing(func(*ui.Window) bool {
 			svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "ModuleQuit", Arg: "gui"})
 			ui.Quit()
@@ -45,8 +48,8 @@ func main() {
 		})
 		window.SetChild(box)
 		button.OnClicked(func(*ui.Button) {
-			svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "InputEvent", Arg: name.Text()})
-			greeting.SetText("Hello, " + name.Text() + "!")
+			svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "start-module", Arg: name.Text()})
+			//greeting.SetText("Hello, " + name.Text() + "!")
 		})
 		window.OnClosing(func(*ui.Window) bool {
 			ui.Quit()

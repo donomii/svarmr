@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"runtime"
 	"time"
 
 	"github.com/donomii/svarmrgo"
@@ -17,17 +18,28 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 	switch m.Selector {
 	case "reveal-yourself":
 		out = append(out, message)
-	case "systray-item":
-		systray.AddMenuItem(m.Arg, m.Arg)
+
+	case "tray-title":
+		systray.SetTitle(m.Arg)
+	case "tray-tooltip":
+		systray.SetTooltip(m.Arg)
+	case "tray-item":
+		item := systray.AddMenuItem(m.Arg, m.Arg)
+		go func() {
+			for {
+				_ = <-item.ClickedCh
+				//mChange.SetTitle("I've Changed")
+				svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "TrayItemClick", Arg: m.Arg})
+			}
+		}()
 	}
 	return out
 }
 
 func main() {
+	runtime.GOMAXPROCS(4)
 	conn := svarmrgo.CliConnect()
 	go svarmrgo.HandleInputLoop(conn, handleMessage)
-	svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "ModuleStart", Arg: "systray"})
-	svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "TrayStart", Arg: "systray"})
 
 	onExit := func() {
 		fmt.Println("Starting onExit")
@@ -55,7 +67,9 @@ func onReady() {
 	go func() {
 		systray.SetIcon(icon.Data)
 		systray.SetTitle("Awesome App")
-		systray.SetTooltip("Pretty awesomeµúÆµúÆÕùÆ")
+		systray.SetTooltip("Tooltray title")
+		item := systray.AddMenuItem("Reveal Modules", "Force all modules to announce themselves")
+		item1 := systray.AddMenuItem("Launch Modules", "Show module launcher")
 		mChange := systray.AddMenuItem("Change Me", "Change Me")
 		mChecked := systray.AddMenuItem("Unchecked", "Check Me")
 		mEnabled := systray.AddMenuItem("Enabled", "Enabled")
@@ -64,7 +78,27 @@ func onReady() {
 		mQuit := systray.AddMenuItem("ÚÇÇÕç║", "Quit the whole app")
 		systray.AddSeparator()
 		mToggle := systray.AddMenuItem("Toggle", "Toggle the Quit button")
+
+		go func() {
+			for {
+				_ = <-item.ClickedCh
+				//mChange.SetTitle("I've Changed")
+				svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "reveal-yourself", Arg: ""})
+			}
+		}()
+
+		go func() {
+			for {
+				_ = <-item1.ClickedCh
+				//mChange.SetTitle("I've Changed")
+				svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "start-module", Arg: "gui/gui"})
+			}
+		}()
+
 		shown := true
+		svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "ModuleStart", Arg: "systray"})
+		svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "TrayStart", Arg: "systray"})
+
 		for {
 			select {
 			case <-mChange.ClickedCh:

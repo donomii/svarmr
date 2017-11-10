@@ -17,9 +17,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os/exec"
 	"strings"
-"log"
+
 	"github.com/donomii/svarmrgo"
 )
 
@@ -27,7 +28,7 @@ func runCommand(cmd *exec.Cmd, stdin io.Reader) bytes.Buffer {
 	cmd.Stdin = stdin
 	var out bytes.Buffer
 	cmd.Stdout = &out
-		var err bytes.Buffer
+	var err bytes.Buffer
 	cmd.Stderr = &err
 	cmd.Run()
 	log.Println(err)
@@ -42,16 +43,22 @@ type NotifyArgs struct {
 }
 
 func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
+	notifu_path := "notifu/notifu.exe"
+	out := []svarmrgo.Message{}
+	//Need to detect windows, blah blah blah
+	/*if _, err := os.Stat(notifu_path); os.IsNotExist(err) {
+		out = append(out, svarmrgo.Message{"error", "Can't find notifu.exe at " + notifu_path})
+	}*/
 	switch m.Selector {
 	case "reveal-yourself":
 		svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "announce", Arg: "user notifier"})
 	case "user-notify":
-		cmd := exec.Command("notifu/notifu.exe", "/m", m.Arg, "/p", "Svarmr", "/t", "info")
+		cmd := exec.Command(notifu_path, "/m", m.Arg, "/p", "Svarmr", "/t", "info")
 		runCommand(cmd, strings.NewReader(""))
 		cmd = exec.Command("osascript", "-e", fmt.Sprintf("display notification \"%v\" with title \"Svarmr\" ", m.Arg))
 		runCommand(cmd, strings.NewReader(""))
 	case "user-notify-error":
-		cmd := exec.Command("notifu/notifu.exe", "/m", m.Arg, "/p", "Svarmr", "/t", "error")
+		cmd := exec.Command(notifu_path, "/m", m.Arg, "/p", "Svarmr", "/t", "error")
 		runCommand(cmd, strings.NewReader(""))
 		cmd = exec.Command("osascript", "-e", fmt.Sprintf("display notification \"%v\" with title \"Svarmr Error\" ", m.Arg))
 		runCommand(cmd, strings.NewReader(""))
@@ -61,14 +68,14 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
-		cmd := exec.Command("notifu/notifu.exe", "/m", a.Message, "/p", a.Title, "/t", a.Level, "/d", a.Duration)
+		cmd := exec.Command(notifu_path, "/m", a.Message, "/p", a.Title, "/t", a.Level, "/d", a.Duration)
 		//fmt.Printf("%v\n",cmd)
 		runCommand(cmd, strings.NewReader(""))
 		cmd = exec.Command("osascript", "-e", fmt.Sprintf("display notification \"%v\" with title \"Svarmr\" ", m.Arg))
 		runCommand(cmd, strings.NewReader(""))
 		//svarmrgo.RespondWith(conn, Message{Selector: "process-list", Arg: string(out.Bytes())})
 	}
-	return []svarmrgo.Message{}
+	return out
 }
 
 func main() {

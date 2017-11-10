@@ -1,5 +1,6 @@
 cd svarmr
 go build clock.go
+go build example.go
 go build server.go
 go build heartBeat.go
 go build heartBeatCmd.go
@@ -44,4 +45,8 @@ cd ..
 
 cd systray
 go build tray.go
+cd ..
+
+cd userMessage
+go build userMessage.go
 cd ..

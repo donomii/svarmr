@@ -6,10 +6,12 @@
 package main
 
 import (
-    "log"
-    "net"
-    "bufio"
-    "fmt"
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net"
 	"os"
 	"os/exec"
 	"time"
@@ -74,7 +76,6 @@ func StartSubproc(cmd string, args []string) subProx {
 var connList []net.Conn
 var subprocList []*subProx
 
-
 func writeMessage(c net.Conn, m string) {
 	w := bufio.NewWriter(c)
 	w.Write([]byte(m))
@@ -85,6 +86,14 @@ func writeMessage(c net.Conn, m string) {
 func broadcast(Q chan connection) {
 	for {
 		m := <-Q
+		//log.Println(m)
+
+		var mess svarmrgo.Message
+		_ = json.Unmarshal([]byte(m.raw), &mess)
+		handleMessage(mess)
+		//for _, v := range messages {
+		//	Q <- v
+		//}
 		inMessages++
 		for _, c := range connList {
 			if c != nil && c != m.port {
@@ -104,11 +113,23 @@ func broadcast(Q chan connection) {
 }
 
 func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
+	log.Println(m)
 	switch m.Selector {
-	case "reveal-yourself":
-		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "announce", Arg: "spine"})}
+	//We don't need to reveal ourselves here, if we weren't running, the message couldn't get through
+	//I guess we should for network situations
+	//FIXME
+	/*case "reveal-yourself":
+	inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "announce", Arg: "spine"})}
+	*/
 	case "start-module":
 		go StartSubproc(m.Arg, []string{"pipes"})
+		go StartSubproc(fmt.Sprintf("%v.exe", m.Arg), []string{"pipes"})
+	case "debug":
+		log.Println(m.Arg)
+	case "log":
+		log.Println(m.Arg)
+	case "error":
+		log.Println(m.Arg)
 	}
 	return []svarmrgo.Message{}
 }
@@ -135,8 +156,9 @@ func handleConnection(conn net.Conn, Q chan connection) {
 
 var inQ chan connection
 
+/*
 func start_network() {
-	go broadcast(inQ)
+
 	ln, err := net.Listen("tcp", "0.0.0.0:4816")
 	if err != nil {
 		fmt.Printf("Couldn't open port 4816")
@@ -152,6 +174,8 @@ func start_network() {
 		go handleConnection(conn, inQ)
 	}
 }
+*/
+
 
 func main() {
 	inQ = make(chan connection, 200)
@@ -159,6 +183,7 @@ func main() {
 	//Don't run network sockets from the server anymore, run the relay module
 	//to handle TCP socket clients
 	//go start_network()
+	go broadcast(inQ)
 
 	//go StartSubproc("svarmr/clock.exe", []string{"pipes"})
 	//go StartSubproc("gui/gui.exe", []string{"pipes"})
@@ -173,3 +198,4 @@ func main() {
 	for {
 		time.Sleep(1.0 * time.Second)
 	}
+}
