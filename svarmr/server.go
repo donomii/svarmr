@@ -14,6 +14,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
 
@@ -55,32 +56,64 @@ func handleSubprocConnection(conn *subProx, Q chan connection) {
 
 }
 
-func StartSubproc(orig_cmd string, args []string) subProx {
+func StartSubproc(orig_cmd string, args []string) *subProx {
+	//It turns out that cmd.Start() doesn't actually tell us if the subprocess started,
+	//just that the internal call succeeded.  So we have no actual way of telling if the
+	//subprocess started, without waiting for it to quit.
 	var cmd string
-	log.Println("Trying ", orig_cmd)
-	if _, err := os.Stat(orig_cmd); os.IsNotExist(err) {
-		//out = append(out, svarmrgo.Message{"error", "Can't find notifu.exe at " + notifu_path})
+	var handle *subProx
+	log.Println("OS:", runtime.GOOS)
+	if runtime.GOOS == "windows" {
+		//This is fucking retarded
+		detectPath := fmt.Sprintf("%s.bat", orig_cmd)
 		cmd = strings.Replace(fmt.Sprintf("%s.bat", orig_cmd), "/", "\\", -1)
 		log.Println("Trying ", cmd)
-		if _, err := os.Stat(cmd); os.IsNotExist(err) {
-			//out = append(out, svarmrgo.Message{"error", "Can't find notifu.exe at " + notifu_path})
-			log.Println("Trying ", cmd)
+		if _, err := os.Stat(detectPath); !os.IsNotExist(err) {
+			handle = ActualStartSubproc(cmd, args)
+		} else {
 			cmd = fmt.Sprintf("%s.exe", orig_cmd)
+			log.Println("Trying ", cmd)
+			handle = ActualStartSubproc(cmd, args)
+			return handle
+		}
+	} else {
+		cmd = fmt.Sprintf("%s.sh", orig_cmd)
+		log.Println("Trying ", cmd)
+		if _, err := os.Stat(cmd); !os.IsNotExist(err) {
+			handle = ActualStartSubproc(cmd, args)
+			return handle
+		} else {
+			log.Println("Trying ", orig_cmd)
+			if _, err := os.Stat(orig_cmd); !os.IsNotExist(err) {
+				handle := ActualStartSubproc(orig_cmd, args)
+				if handle != nil {
+					log.Println("Succeeded starting ", orig_cmd)
+					return handle
+				}
+			}
 		}
 	}
 
+	return nil
+}
+
+func ActualStartSubproc(cmd string, args []string) *subProx {
 	grepCmd := exec.Command(cmd, args...)
 
 	grepIn, _ := grepCmd.StdinPipe()
 	grepOut, _ := grepCmd.StdoutPipe()
 	//Err, _ := grepCmd.StderrPipe()
 
-	grepCmd.Start()
+	err := grepCmd.Start()
+	log.Println("Start command result:", err)
+	if err != nil {
+		return nil
+	}
 	p := subProx{grepIn, grepOut, nil, grepCmd}
 	subprocList = append(subprocList, &p)
 	go handleSubprocConnection(&p, inQ)
 	inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "user-notify", Arg: "Service started: " + cmd})}
-	return p
+	return &p
 	//grepIn.Write([]byte("hello grep\ngoodbye grep"))
 	//grepIn.Close()
 	//grepBytes, _ := ioutil.ReadAll(grepOut)
