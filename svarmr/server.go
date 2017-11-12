@@ -14,6 +14,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/donomii/svarmrgo"
@@ -54,10 +55,18 @@ func handleSubprocConnection(conn *subProx, Q chan connection) {
 
 }
 
-func StartSubproc(cmd string, args []string) subProx {
-	if _, err := os.Stat(cmd); os.IsNotExist(err) {
+func StartSubproc(orig_cmd string, args []string) subProx {
+	var cmd string
+	log.Println("Trying ", orig_cmd)
+	if _, err := os.Stat(orig_cmd); os.IsNotExist(err) {
 		//out = append(out, svarmrgo.Message{"error", "Can't find notifu.exe at " + notifu_path})
-		cmd = fmt.Sprintf("%s.exe", cmd)
+		cmd = strings.Replace(fmt.Sprintf("%s.bat", orig_cmd), "/", "\\", -1)
+		log.Println("Trying ", cmd)
+		if _, err := os.Stat(cmd); os.IsNotExist(err) {
+			//out = append(out, svarmrgo.Message{"error", "Can't find notifu.exe at " + notifu_path})
+			log.Println("Trying ", cmd)
+			cmd = fmt.Sprintf("%s.exe", orig_cmd)
+		}
 	}
 
 	grepCmd := exec.Command(cmd, args...)
