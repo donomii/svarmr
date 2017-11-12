@@ -1,5 +1,6 @@
 cd svarmr
 go build server.go &
+go build example.go &
 go build heartBeat.go &
 gcc monitor.c -Os -flto -lm -omonitorc &
 go build monitor.go &
@@ -37,6 +38,14 @@ go build volume.go &
 go build insertKey.go &
 go build volumeControllerWindows.go &
 go build torrentListener.go &
+cd ..
+
+cd systray
+go build tray.go
+cd ..
+
+cd gui
+go build gui.go
 cd ..
 
 
