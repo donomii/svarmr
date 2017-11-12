@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"fmt"
+	"time"
 	"github.com/andlabs/ui"
 	"github.com/donomii/svarmrgo"
 )
@@ -44,6 +47,7 @@ func main() {
 		window.OnClosing(func(*ui.Window) bool {
 			svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "ModuleQuit", Arg: "Module Launcher"})
 			ui.Quit()
+			os.Exit(0)
 			return true
 		})
 		window.SetChild(box)
@@ -53,11 +57,13 @@ func main() {
 		})
 		window.OnClosing(func(*ui.Window) bool {
 			ui.Quit()
+			os.Exit(0)
 			return true
 		})
 		window.Show()
 	})
 	if err != nil {
-		panic(err)
+		svarmrgo.SendMessage(nil, svarmrgo.Message{Selector: "error", Arg: fmt.Sprintf("%v", err)})
 	}
+	time.Sleep(5 * time.Second)
 }
