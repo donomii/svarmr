@@ -1,1 +1,1 @@
-tcltk\bin\tclsh.exe moduleLoader\heartthrob.tcl
+tcltk\bin\tclsh.exe guimodules\heartthrob.tcl
