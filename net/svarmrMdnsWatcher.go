@@ -96,8 +96,8 @@ func main() {
     go watchDNS(entriesCh)
     go func() {
         for entry := range entriesCh {
-           svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv4", Arg: fmt.Sprintf("%v:%v", entry.AddrV4, entry.Port)})
-           svarmrgo.RespondWith(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv6", Arg: fmt.Sprintf("%v:%v", entry.AddrV6, entry.Port)})
+           svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv4", Arg: fmt.Sprintf("%v:%v", entry.AddrV4, entry.Port)})
+           svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv6", Arg: fmt.Sprintf("%v:%v", entry.AddrV6, entry.Port)})
         }
     }()
     for{
