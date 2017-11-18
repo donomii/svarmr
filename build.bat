@@ -3,7 +3,6 @@ go build clock.go
 go build example.go
 go build server.go
 go build heartBeat.go
-go build heartBeatCmd.go
 gcc monitor.c -Os -flto -omonitorc
 go build monitor.go
 go build svarmrMessage.go
