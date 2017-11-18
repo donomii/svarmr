@@ -112,7 +112,8 @@ func ActualStartSubproc(cmd string, args []string) *subProx {
 	p := subProx{grepIn, grepOut, nil, grepCmd}
 	subprocList = append(subprocList, &p)
 	go handleSubprocConnection(&p, inQ)
-	inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "user-notify", Arg: "Service started: " + cmd})}
+	//Don't notify for every one, it floods the user
+	//inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "user-notify", Arg: "Service started: " + cmd})}
 	return &p
 	//grepIn.Write([]byte("hello grep\ngoodbye grep"))
 	//grepIn.Close()
