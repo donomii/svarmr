@@ -47,7 +47,8 @@ func handleSubprocConnection(conn *subProx, Q chan connection) {
 	for {
 		t, err := reader.ReadString('\n')
 		if err != nil {
-			//fmt.Println("Client disconnected: ", err)
+			log.Println("Client disconnected: ", err)
+			inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "finish-module", Arg: "Module disconnected: " + err})}
 			return
 		}
 		var m connection = connection{nil, conn, t}
@@ -55,6 +56,23 @@ func handleSubprocConnection(conn *subProx, Q chan connection) {
 	}
 
 }
+func handleSubprocErrors(conn *subProx, Q chan connection) {
+
+	reader := bufio.NewReader(conn.Err)
+
+	for {
+		t, err := reader.ReadString('\n')
+		if err != nil {
+			log.Println("Client disconnected: ", err)
+			inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "finish-module", Arg: "Module disconnected: " + err})}
+			return
+		}
+		log.Println("Module error: ', t)
+		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "error-module", Arg: "Module error: " + t})}
+	}
+
+}
+
 
 func StartSubproc(orig_cmd string, args []string) *subProx {
 	//It turns out that cmd.Start() doesn't actually tell us if the subprocess started,
@@ -93,7 +111,6 @@ func StartSubproc(orig_cmd string, args []string) *subProx {
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -102,14 +119,14 @@ func ActualStartSubproc(cmd string, args []string) *subProx {
 
 	grepIn, _ := grepCmd.StdinPipe()
 	grepOut, _ := grepCmd.StdoutPipe()
-	//Err, _ := grepCmd.StderrPipe()
+	grepErr, _ := grepCmd.StderrPipe()
 
 	err := grepCmd.Start()
 	log.Println("Start command result:", err)
 	if err != nil {
 		return nil
 	}
-	p := subProx{grepIn, grepOut, nil, grepCmd}
+	p := subProx{grepIn, grepOut, grepErr, grepCmd}
 	subprocList = append(subprocList, &p)
 	go handleSubprocConnection(&p, inQ)
 	//Don't notify for every one, it floods the user
