@@ -11,39 +11,45 @@ proc dict2json {dictToEncode} {
 
 source theme.tcl
 
-
-
 proc emitMessage {selector data} {
 	puts stdout  [ dict2json [ dict create Selector $selector Arg $data ] ] 
 }
 
-frame .launchpad -background $containerBackground
- label .launchpad.label1 -background $textBackgroundColor -foreground $textColor -font $font -text "Modules"
- pack .launchpad.label1
+set menuPack [list .f -fill both]
 
- button .launchpad.button1 -text "Module Loader" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module moduleLoader/moduleLoader}
- pack .launchpad.button1
+frame .f -background $containerBackground
+ label .f.label1 -background $textBackgroundColor -foreground $textColor -font $font -text "Modules"
+ pack .f.label1
+
+ button .f.button1 -text "Module Loader" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module moduleLoader/moduleLoader}
+ pack .f.button1  {*}$menuPack
  
- button .launchpad.button2 -text "Message Sender" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module messageSender/messageSender}
- pack .launchpad.button2
+ button .f.button2 -text "Message Sender" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module messageSender/messageSender}
+ pack .f.button2 {*}$menuPack
   
- button .launchpad.button3 -text "Canvas" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module guimodules/heart}
- pack .launchpad.button3
+ button .f.button3 -text "Canvas" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module guimodules/heart}
+ pack .f.button3 {*}$menuPack
 
- button .launchpad.button4 -text "Animated Canvas" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module guimodules/heartthrob}
- pack .launchpad.button4
+ button .f.button4 -text "Animated Canvas" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module guimodules/heartthrob}
+ pack .f.button4 {*}$menuPack
  
- button .launchpad.button5 -text "Message Monitor" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module guimodules/monitor}
- pack .launchpad.button5
+ button .f.button5 -text "Message Monitor" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module guimodules/monitor}
+ pack .f.button5 {*}$menuPack
  
- button .launchpad.button6 -text "User Notifier" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module svarmr/usernotify}
- pack .launchpad.button6
+ button .f.button6 -text "User Notifier" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module svarmr/usernotify}
+ pack .f.button6 {*}$menuPack
  
- button .launchpad.button7 -text "Tray Icon" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module systray/tray}
- pack .launchpad.button7
+ button .f.button7 -text "Tray Icon" -background $textBackgroundColor -foreground $textColor -font $font -command {emitMessage start-module systray/tray}
+ pack .f.button7 {*}$menuPack
+ 
+ button .f.button8 -text "Grtrm" -background $textBackgroundColor -foreground $textColor -font $font -command {
+ emitMessage start-module pocketbonsai
+ emitMessage start-module menu/GrtrmMenu
+ }
+ pack .f.button8 {*}$menuPack
  
  
  
- pack .launchpad -side top
+ pack .f -side top
 
 puts stdout  [ dict2json [ dict create Selector ModuleStart Arg MessageSender ] ]
