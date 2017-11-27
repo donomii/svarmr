@@ -7,17 +7,21 @@ A networked control bus and messaging system, with many useful modules
 * Trigger on custom events
 * Easy access to platform libraries
 
+
+
 ## Easy to add modules
 
 Svarmr is a simple message bus that is super easy to write new modules for.
 
 Simple modules can be a few lines long, and there are examples in Go, Racket, Perl, and C.
 
+* [Go](https://github.com/donomii/svarmrgo)
+
 ## Features
 
 Svarmr already has some useful modules, that monitor clipboard changes, respond to keys, speak text, and detect notes.
 
-## Design
+# Design
 
 ### Sources, sinks and processors
 
