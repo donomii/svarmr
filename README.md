@@ -11,7 +11,7 @@ A networked control bus and messaging system, with many useful modules
 
 ## Easy to add modules
 
-Svarmr is a simple message bus that is super easy to write new modules for.
+Svarmr is a simple message bus that is super easy to connect to.
 
 Simple modules can be a few lines long, and there are examples in Go, Racket, Perl, and C.
 
