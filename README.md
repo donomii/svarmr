@@ -7,8 +7,6 @@ A networked control bus and messaging system, with many useful modules
 * Trigger on custom events
 * Easy access to platform libraries
 
-
-
 ## Easy to add modules
 
 Svarmr is a simple message bus that is super easy to connect to.
@@ -23,17 +21,17 @@ Svarmr already has some useful modules, that monitor clipboard changes, respond 
 
 # Design
 
-### Sources, sinks and processors
+## Sources, sinks and processors
 
-Each module can transmit and receive any events it pleases, but it is useful to break them into categories of modules that mainly generate events (sources), modules that wait for events and then do something (sinks), and modules that wait for events, process them and send new events (processors).
+Each module can transmit and receive any events it pleases, but it is useful to break them into sources, sinks, and processors.  Sources mainly generate events, sinks wait for events and then do something, and processors wait for events, deal with them and then send new events (processors).
 
-#### Sources
+### Sources
 
 * clipboardWatcher  - Broadcasts clipboard changes
 * mdnsWatcher       - Broadcasts mDNS results
-* heartBeat         - Broadcasts a regular beat
+* heartBeat         - Broadcasts a regular beat (more useful than it sounds)
 
-#### Sinks
+### Sinks
 
 * torrentListener   - Starts torrents in Deluge
 * monitor.c         - Prints events to stdout
@@ -43,33 +41,35 @@ Each module can transmit and receive any events it pleases, but it is useful to 
 * moduleStarter     - launches other modules
 * imgdisplay        - Displays an image
 
-#### Processors
+### Processors
 
-* clipboardProcessor- Choose an action based on clipboard contents
+* clipboardProcessor - Choose an action based on clipboard contents
+* relay              - Connects two computers (network bus)
 
-#### Pitch
+## Other modules
+
+Not all modules fall into these easy categories, and sometimes it is better to keep related modules together.
+
+### Pitch
 
 * detect/pitchDetect    - Listens on the microphone and outputs note pitch
 * pitchWrapper      - Wraps pitchDetect
 * pitchProcessor    - Filters pitch results and outputs notes
 * noteKeyboard      - Turns notes into keypresses and sends them to the active window
 
-#### Misc
+### Misc
 
 * server            - The message bus daemon
 * svarmr.server     - Avahi service definition file
-* relay             - Connects two computers (network bus)
 
+# Helpers
 
-## Helpers
-
-Svarmr relies on a lot of other projects to provide cross platform features.  They are
+Svarmr relies on a lot of other projects to provide cross platform features.  As a result, I package and ship the following programs with svarmr.
 
 * Notifu - Popup messages on windows
     * https://www.paralint.com/projects/notifu/download.html
 * Autohotkey - Intercept keys, and insert keys
     * http://autohotkey.com
-
 * Deluge - Download torrents (linux)
     * http://deluge-torrent.org/
 * fswatch - Detect filesystem changes
