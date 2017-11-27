@@ -23,7 +23,7 @@ Svarmr already has some useful modules, that monitor clipboard changes, respond 
 
 ## Sources, sinks and processors
 
-Each module can transmit and receive any events it pleases, but it is useful to break them into sources, sinks, and processors.  Sources mainly generate events, sinks wait for events and then do something, and processors wait for events, deal with them and then send new events (processors).
+Each module can transmit and receive any events it pleases, but it is useful to break them into sources, sinks, and processors.  Sources mainly generate events, sinks wait for events and then do something, and processors wait for events, deal with them and then send new events.
 
 ### Sources
 
