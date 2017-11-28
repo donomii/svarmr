@@ -1,3 +1,28 @@
+#svarmrlib
+
+#A library to connect to the svarmr message bus
+
+#To use this, you must create a function to handle svarmr messages.  It must be called "svarmrMessageHandler".  svarmrMessageHandler will be called for each new message, and the data will be in the form of a dict.
+
+#The dict will contain several fields, but most importantly, a "Selector" key, and an "Arg" key.  The Selector is the "procedure name", that the message is trying to call, and the Arg is the data for that function.
+
+#Be prepared to ignore Selectors that you don't know how to handle, svarmr will sometimes route broadcast messages to your module.
+
+#An example of including svarmr in your program
+
+
+#proc svarmrMessageHandler {$message} {
+#	SendSimple [dict create Selector GotMessage Arg $message]
+#}
+#
+#source lib/svarmrlib.tcl
+
+#This will respond to every svarmr message with another message - making this an "echo server"
+
+#The input processing runs in its own thread, and calls svarmrMessageHandler in the main thread.
+
+#Note that svarmr usually takes control of your STDIN and STDOUT, to pass messages.
+
 package require Tk 
 package require Thread
 package require json::write
