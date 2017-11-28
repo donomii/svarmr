@@ -16,4 +16,4 @@ proc svarmrMessageHandler {$message} {
 	SendSimple [dict create Selector GotMessage Arg $message]
 }
 
-source svarmrlib.tcl
+source lib/svarmrlib.tcl
