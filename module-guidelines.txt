@@ -1,0 +1,28 @@
+Specs
+
+Svarmr is distributed as a zip file.  It does not install any programs, and it does not require any programs to be installed.  This means it must carry every runtime with it, and they must be configured correctly so they simply run as needed.
+
+So
+
+You cannot require that the user install any program to use the basic features of svarmr.
+
+You can distribute support programs with svarmr, but it's better to avoid them.
+
+You cannot require that the user run with admin priviledges, or modify their system in any way to support basic program operation (unless that is a feature of your module).
+
+You cannot rely any program at all, unless it is already present on MacOSX, Linux, and Windows.  So, basically, nothing.
+
+You *can* require support libraries where appropriate.  e.g. SDL for graphics, kernel headers for features involving the OS.  But the basic libraries shouldn't need this (except for a JSON parser).
+
+In general, the entire project needs to be easily automated, usually by running a batch file.  On the command line.  Builds should not require any more programs to be installed.  So no cmake.  No make.  No maven, ant, grunt, gradle, or whatever.  You cannot require developers to download a 1GB IDE to compile a 10 line program.
+
+Where possible, attempt to do a static build.  It's so much easier to distribute than managing a lot of library files.
+
+Operation
+
+The svarmr library must not take over the program it is used in.  It must not require being run from the main thread, or to be locked to a CPU.  It must not halt the rest of the program while waiting for a message, or while sending one.  It doesn't matter if you achieve that with threads or async calls (e.g. it's ok to require the user to make a "checkForMessages()" function call 100x per second).
+
+All JSON values are to be sent as correctly encoded JSON strings.  No raw numbers.  This is mainly to make it simpler for the (non-duck) typed languages.
+
+Avoid massive messages.  In theory, you can send a 1Gb message, in practise it probably won't arrive, and stands a good chance of locking up the computer as a bonus.  A 1 mb jpeg is probably ok, but in general try to save large binaries into a file, and send a URL instead.  This makes networking mode harder to use correctly, but is better than crashing everything.
+
