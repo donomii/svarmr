@@ -27,10 +27,7 @@ proc jsonget {json args} {
     return $json
 }
 
-proc sendMessage {message} {
-
-
-
+proc SimpleSend {message} {
 	puts stdout  [ dict2json $message ]
 }
 
@@ -41,30 +38,42 @@ set string [tsv::object foo bar]
 
 $string set [thread::id]
 
-set t1 [thread::create {
-package require json
-proc jsonget {json args} {
-    foreach key $args {
-        if {[dict exists $json $key]} {
-            set json [dict get $json $key]
-        } elseif {[string is integer $key]} {
-            if {$key >= 0 && $key < [llength $json]} {
-                set json [lindex $json $key]
-            } else {
-                error "can't get item number $key from {$json}"
-            }
-        } else {
-            error "can't get \"$key\": no such key in {$json}"
-        }
-    }
-    return $json
+#set svarmrMessageHandler [SimpleSend [dict create "Selector" "gotMessage" "Arg" $message]]
+
+proc process_message {message} {
+
+$svarmrMessageHandler [::json::json2dict $message]
+
 }
+
+set t1 [thread::create {
+		package require json
+
+		proc jsonget {json args} {
+			foreach key $args {
+				if {[dict exists $json $key]} {
+					set json [dict get $json $key]
+				} elseif {[string is integer $key]} {
+					if {$key >= 0 && $key < [llength $json]} {
+						set json [lindex $json $key]
+					} else {
+						error "can't get item number $key from {$json}"
+					}
+				} else {
+					error "can't get \"$key\": no such key in {$json}"
+				}
+			}
+			return $json
+		}
+		
 		set string [tsv::object foo bar]
 		while (1) {
 			set mainThread [ $string get ]
 			gets stdin message
 			thread::send $mainThread [list set displaytextvariable [jsonget [::json::json2dict $message] Selector]]
+			thread::send $mainThread [list process_message $message]
 		}
 	}
 ]
 
+SimpleSend {"Selector" "module-started" "Arg" "tcl lib"}
