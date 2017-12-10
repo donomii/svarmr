@@ -20,7 +20,8 @@ cd pitch
 go build pitchWrapper.go
 go build pitchProcessor.go
 go build noteKeyboard.go
-cd detect  gcc -l PortAudio pitchDetect.c -o pitchDetect
+cd detect
+gcc -l PortAudio pitchDetect.c -o pitchDetect
 cd ..
 
 cd image
