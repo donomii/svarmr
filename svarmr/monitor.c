@@ -15,20 +15,13 @@ Compile with gcc monitor.c -Os -flto -lWs2_32
 
 
 #ifdef _WIN32
-  /* See http://stackoverflow.com/questions/12765743/getaddrinfo-on-win32 */
   #ifndef _WIN32_WINNT
     #define _WIN32_WINNT 0x0501  /* Windows XP. */
   #endif
-  #include <winsock2.h>
-  #include <Ws2tcpip.h>
 #else
   /* Assume that any non-Windows platform uses POSIX-style sockets instead. */
   #include <sys/socket.h>
-  #include <arpa/inet.h>
-  #include <netdb.h>  /* Needed for getaddrinfo() and freeaddrinfo() */
   #include <unistd.h> /* Needed for close() */
-  #include <netinet/in.h>
-  #include <arpa/inet.h>
 
 #endif
 
@@ -43,9 +36,6 @@ typedef struct {
 
 Message mess;
 char * str;
-
-
-#define PORT "4816" // the port client will be connecting to
 
 #define MAXDATASIZE 10000 // max number of bytes we can get at once
 
@@ -131,95 +121,31 @@ static void process_value(json_value* value, int depth)
         }
 }
 
-
-// get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
-{
-    if (sa->sa_family == AF_INET) {
-        return &(((struct sockaddr_in*)sa)->sin_addr);
-    }
-
-    return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-int main(int argc, char *argv[])
-{
-    int sockfd, numbytes;
+int main(int argc, char *argv[]) {
+    int numbytes;
     char buf[MAXDATASIZE];
-    struct addrinfo hints, *servinfo, *p;
-    int rv;
-    char s[INET6_ADDRSTRLEN];
-
-    if (argc != 3) {
-        fprintf(stderr,"usage: client hostname port\n");
+    if (argc != 2) {
+        fprintf(stderr,"use: monitor hostname:port\n");
+		fprintf(stderr,"or\n");
+		fprintf(stderr,"use: monitor pipes\n");
         exit(1);
     }
 
-
-    #ifdef _WIN32
-       WSADATA wsa_data;
-       WSAStartup(MAKEWORD(1,1), &wsa_data);
-     #endif
-
-
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-
-
-    if ((rv = getaddrinfo(argv[1], argv[2], &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return 1;
-    }
-
-printf("Connecting\n");
-    // loop through all the results and connect to the first we can
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                p->ai_protocol)) == -1) {
-            perror("client: socket");
-            continue;
-        }
-
-        if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-            close(sockfd);
-            perror("client: connect");
-            continue;
-        }
-
-        break;
-    }
-
-    if (p == NULL) {
-        fprintf(stderr, "client: failed to connect\n");
-        return 2;
-    }
-
-    inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
-            s, sizeof s);
-    printf("client: connecting to %s\n", s);
-
-    freeaddrinfo(servinfo); // all done with this structure
     for(;;) {
-    if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-        perror("recv");
-        exit(1);
-    }
+		gets(buf);
 
-    buf[numbytes] = '\0';
+		buf[numbytes] = '\0';
 
-    //printf("client: received '%s'\n",buf);
-    json_char* json = (json_char*)buf;
+		//printf("client: received '%s'\n",buf);
+		json_char* json = (json_char*)buf;
 
         json_value* value = json_parse(json,numbytes);
         if (value == NULL) {
-                //fprintf(stderr, "Unable to parse data\n");
+			fprintf(stderr, "Invalid message\n");
         } else {
         process_value(value, 0);
-        printf("%s:%s\n", mess.Selector, mess.Arg);
+        fprintf(stderr, "%s:%s\n", mess.Selector, mess.Arg);
       }
-}
-    close(sockfd);
-
+	}
     return 0;
 }
