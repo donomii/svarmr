@@ -48,7 +48,7 @@ func handleSubprocConnection(conn *subProx, Q chan connection) {
 		t, err := reader.ReadString('\n')
 		if err != nil {
 			log.Println("Client disconnected: ", err)
-			inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "finish-module", Arg: "Module disconnected: " + err})}
+			inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "finish-module", Arg: fmt.Sprintf("Module disconnected: %v", err)})}
 			return
 		}
 		var m connection = connection{nil, conn, t}
@@ -64,10 +64,10 @@ func handleSubprocErrors(conn *subProx, Q chan connection) {
 		t, err := reader.ReadString('\n')
 		if err != nil {
 			log.Println("Client disconnected: ", err)
-			inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "finish-module", Arg: "Module disconnected: " + err})}
+			inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "finish-module", Arg: fmt.Sprintf("Module disconnected: %v", err)})}
 			return
 		}
-		log.Println("Module error: ', t)
+		log.Println("Module error: ", t)
 		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "error-module", Arg: "Module error: " + t})}
 	}
 
