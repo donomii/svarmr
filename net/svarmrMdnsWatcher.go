@@ -1,6 +1,7 @@
 package main
 import (
 "errors"
+"log"
     "fmt"
     //"os"
     //"encoding/json"
@@ -8,7 +9,8 @@ import (
     "time"
 "net"
 "math/rand"
- "github.com/hashicorp/mdns"
+ "github.com/oleksandr/bonjour"
+ "os"
 )
 
 
@@ -32,15 +34,33 @@ func random(min, max int) int {
 //>···sent   bool
 //}
 
-var server *mdns.Server
 
 
-func watchDNS (entriesCh chan *mdns.ServiceEntry) {
-    for {
-        // Start the lookup
-        go mdns.Lookup("_svarmr._tcp.", entriesCh)
-        time.Sleep(time.Duration(random(5000,30000))*time.Millisecond)
+func watchDNS (conn net.Conn, entriesCh chan *bonjour.ServiceEntry) {
+svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "debug", Arg: "Scanning mdns for _tcp"})
+resolver, err := bonjour.NewResolver(nil)
+    if err != nil {
+        log.Println("Failed to initialize resolver:", err.Error())
+        os.Exit(1)
     }
+		log.Println("Starting mdns lookup")
+		
+		//, "_smb._tcp", "_googlecast._tcp", "_udisks-ssh._tcp",   "_webdav._tcp", "_ssh._tcp", "_telnet._tcp"
+			go func (){
+				err = resolver.Browse("_tcp", "", entriesCh)
+				if err != nil {
+					log.Println("Failed to browse:", err.Error())
+				}
+			}()
+			//log.Println("Searching for ", v)
+		
+        
+		//"_svarmr._tcp.",
+		
+		
+		
+		time.Sleep(time.Duration(random(50000,300000))*time.Millisecond)
+    
 }
 
 //https://code.google.com/archive/p/whispering-gophers/
@@ -81,23 +101,38 @@ func externalIP() (net.IP, error) {
     return nil, errors.New("are you connected to the network?")
 }
 
-func handleMessage (conn net.Conn, m svarmrgo.Message) {
+func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
+	out := []svarmrgo.Message{}
      switch m.Selector {
         case "reveal-yourself" :
            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "mDnsWatcher"})
       }
+	  return out
 }
 
 func main() {
     rand.Seed(time.Now().Unix())
-    conn := svarmrgo.CliConnect()
-    go svarmrgo.HandleInputs(conn, handleMessage)
-    entriesCh := make(chan *mdns.ServiceEntry, 4) 
-    go watchDNS(entriesCh)
+	conn := svarmrgo.CliConnect()
+	go svarmrgo.HandleInputLoop(conn, handleMessage)
+    entriesCh := make(chan *bonjour.ServiceEntry, 40) 
+    go watchDNS(conn, entriesCh)
     go func() {
         for entry := range entriesCh {
-           svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv4", Arg: fmt.Sprintf("%v:%v", entry.AddrV4, entry.Port)})
-           svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv6", Arg: fmt.Sprintf("%v:%v", entry.AddrV6, entry.Port)})
+			log.Println("Got mdns response")
+           //svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv4", Arg: fmt.Sprintf("%v:%v", entry.AddrIPv4, entry.Port)})
+           //svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-found-svarmr-ipv6", Arg: fmt.Sprintf("%v:%v", entry.AddrIPv6, entry.Port)})
+		   svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-service-found-summary", Arg: fmt.Sprintf("%v:%v (%v)", entry.HostName, entry.Port, entry.Instance)})
+		   svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "mdns-service-found", Args: []string{
+		   "Instance", fmt.Sprintf("%v", entry.Instance),
+		   "HostName", fmt.Sprintf("%v", entry.HostName), 
+		   "Text", fmt.Sprintf("%v", entry.Text), 
+		   "AddrV4", fmt.Sprintf("%v", entry.AddrIPv4), 
+		   "AddrV6", fmt.Sprintf("%v", entry.AddrIPv6), 
+		   "Port", fmt.Sprintf("%v", entry.Port),
+		   "Service", fmt.Sprintf("%v", entry.Service), 
+		   "Domain", fmt.Sprintf("%v", entry.Domain), 
+		   "TTL", fmt.Sprintf("%v", entry.TTL), 
+		   }})
         }
     }()
     for{

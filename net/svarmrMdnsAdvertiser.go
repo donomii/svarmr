@@ -81,25 +81,28 @@ func advertiseDNS () {
     info := []string{"Svarmr network control bus"}
     ip, _ := externalIP()
     fmt.Printf("External IP: %v\n", ip)
-    service, err := mdns.NewMDNSService(host, "_svarmr._tcp.", "", fmt.Sprintf("%v.local.", host), 4816, []net.IP{ip}, info)
+    service, err := mdns.NewMDNSService(host, "_svarmr._tcp.local.", "local.", fmt.Sprintf("%v.local.", host), 4816, []net.IP{ip}, info)
     fmt.Printf("Error: %v\n", err)
 
     // Create the mDNS server, defer shutdown
-    server, _ = mdns.NewServer(&mdns.Config{Zone: service})
+    server, err = mdns.NewServer(&mdns.Config{Zone: service})
+	fmt.Printf("Error: %v\n", err)
 }
 
 
-func handleMessage (conn net.Conn, m svarmrgo.Message) {
+func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
+	out := []svarmrgo.Message{}
      switch m.Selector {
         case "reveal-yourself" :
            m.Respond(svarmrgo.Message{Selector: "announce", Arg: "svarmrMdnsAdvertiser"})
       }
+	  return out
 }
 
 func main() {
+	conn := svarmrgo.CliConnect()
+	go svarmrgo.HandleInputLoop(conn, handleMessage)
     rand.Seed(time.Now().Unix())
-    conn := svarmrgo.CliConnect()
-    go svarmrgo.HandleInputs(conn, handleMessage)
     advertiseDNS()
     for{
         time.Sleep(12000 * time.Millisecond)
