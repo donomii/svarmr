@@ -38,7 +38,7 @@ proc dict2json {dictToEncode} {
 proc jsonget {json args} {
     foreach key $args {
         if {[dict exists $json $key]} {
-            set json [dict get $json $key]
+				set json [dict get $json $key]
         } elseif {[string is integer $key]} {
             if {$key >= 0 && $key < [llength $json]} {
                 set json [lindex $json $key]
@@ -52,8 +52,9 @@ proc jsonget {json args} {
     return $json
 }
 
-proc SimpleSend {message} {
-	puts stdout  [ dict2json $message ]
+proc SimpleSend {selector arg} {
+    set out [dict create "Selector" $selector "Arg" $arg]
+	puts stdout  [ dict2json $out ]
 }
 
 set displaytextvariable hello
@@ -63,11 +64,12 @@ set string [tsv::object foo bar]
 
 $string set [thread::id]
 
-#set svarmrMessageHandler [SimpleSend [dict create "Selector" "gotMessage" "Arg" $message]]
+#set svarmrMessageHandler 
 
 proc process_message {message} {
 
-$svarmrMessageHandler [::json::json2dict $message]
+SimpleSend "debug" "processing message"
+svarmrMessageHandler [::json::json2dict $message]
 
 }
 
@@ -101,4 +103,4 @@ set t1 [thread::create {
 	}
 ]
 
-SimpleSend {"Selector" "module-started" "Arg" "tcl lib"}
+SimpleSend  "module-started" "tcl lib"
