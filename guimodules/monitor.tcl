@@ -4,16 +4,27 @@
 	package require json
 
 source theme.tcl
-
+set menuPack [list .launchpad -fill both]
 
 frame .launchpad 
  label .launchpad.label1 -background $textBackgroundColor -foreground $textColor -font $font -text "message goes here" -textvariable displaytextvariable -justify right
  pack .launchpad.label1
+ 
+ tk::text .launchpad.text -width 40 -height 10
+ pack .launchpad.text {*}$menuPack
 
  pack .launchpad -side top
 
-proc svarmrMessageHandler {$message} {
-	SendSimple [dict create Selector GotMessage Arg $message]
+source lib/svarmrlib.tcl
+
+
+proc svarmrMessageHandler {message} {
+SimpleSend "debug" [dict get $message "Selector"]
+	if {[dict get $message "Selector"] eq "mdns-service-found-summary"} {
+	.launchpad.text insert 1.0 "\n"
+	.launchpad.text insert 1.0  [dict get $message Arg]
+	}
+	
 }
 
-source lib/svarmrlib.tcl
+SimpleSend "debug" "started monitor"
