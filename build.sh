@@ -50,3 +50,4 @@ cd ..
 
 
 wait
+move svarmr/server .

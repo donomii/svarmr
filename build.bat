@@ -2,6 +2,7 @@ cd svarmr
 go build clock.go
 go build example.go
 go build server.go
+move server.exe ..
 go build heartBeat.go
 gcc monitor.c -Os -flto -omonitorc
 go build monitor.go
