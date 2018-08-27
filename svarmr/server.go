@@ -17,12 +17,16 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"github.com/kardianos/osext"
+	//"path/filepath"
 
 	"github.com/donomii/svarmrgo"
 )
 
 const queueLength int = 1
 
+var SvarmrDirectory string
+var AppDirectory string
 var inMessages int = 0
 var outMessages int = 0
 
@@ -74,43 +78,59 @@ func handleSubprocErrors(conn *subProx, Q chan connection) {
 }
 
 
-func StartSubproc(orig_cmd string, args []string) *subProx {
-	//It turns out that cmd.Start() doesn't actually tell us if the subprocess started,
-	//just that the internal call succeeded.  So we have no actual way of telling if the
-	//subprocess started, without waiting for it to quit.
-	var cmd string
-	var handle *subProx
-	log.Println("OS:", runtime.GOOS)
-	if runtime.GOOS == "windows" {
-		//This is fucking retarded
-		detectPath := fmt.Sprintf("%s.bat", orig_cmd)
-		cmd = strings.Replace(fmt.Sprintf("%s.bat", orig_cmd), "/", "\\", -1)
-		log.Println("Trying ", cmd)
-		if _, err := os.Stat(detectPath); !os.IsNotExist(err) {
-			handle = ActualStartSubproc(cmd, args)
-		} else {
-			cmd = fmt.Sprintf("%s.exe", orig_cmd)
+//Attempts to start a svarmr module.  Because we are cross platform, we have to check for multiple types of executable - on windows, we must support .bat and .exe, on linux we must support .sh and "no extension".  The user gives us a module name, and we go through, checking each extension.
+//We also have to check multiple locations for modules.  The intent is that the application developer writes their program in a separate directory, and then runs svarmr, which is installed in its own directory.  Every time a module is loaded, svarmr must check the application directory first, then the base svarmr directory.
+//To do this, pass a list of paths to StartSubproc, and the paths will be checked in order
+func StartSubproc(orig_cmd string, args []string, paths []string) *subProx {
+	log.Println("Search paths", paths)
+	for _, moduleDir := range paths {
+		log.Printf("Searching for %v in %v", orig_cmd, moduleDir)
+		os.Chdir(moduleDir)
+		dir, _ := os.Getwd() //FFS
+		log.Printf("Changed directory to %v", dir)
+		//It turns out that cmd.Start() doesn't actually tell us if the subprocess started,
+		//just that the internal call succeeded.  So we have no actual way of telling if the
+		//subprocess started, without waiting for it to quit.
+		var cmd string
+		var handle *subProx
+		log.Println("OS:", runtime.GOOS)
+		if runtime.GOOS == "windows" {
+			//This is fucking retarded
+			detectPath := fmt.Sprintf("%s.bat", orig_cmd)
+			cmd = strings.Replace(fmt.Sprintf("%s.bat", orig_cmd), "/", "\\", -1)
 			log.Println("Trying ", cmd)
-			handle = ActualStartSubproc(cmd, args)
-			return handle
-		}
-	} else {
-		cmd = fmt.Sprintf("%s.sh", orig_cmd)
-		log.Println("Trying ", cmd)
-		if _, err := os.Stat(cmd); !os.IsNotExist(err) {
-			handle = ActualStartSubproc(cmd, args)
-			return handle
-		} else {
-			log.Println("Trying ", orig_cmd)
-			if _, err := os.Stat(orig_cmd); !os.IsNotExist(err) {
-				handle := ActualStartSubproc(orig_cmd, args)
+			if _, err := os.Stat(detectPath); !os.IsNotExist(err) {
+				log.Println("Found", cmd)
+				handle = ActualStartSubproc(cmd, args)
+			} else {
+				cmd = fmt.Sprintf("%s.exe", orig_cmd)
+				log.Println("Trying ", cmd)
+				handle = ActualStartSubproc(cmd, args)
+			}
 				if handle != nil {
-					log.Println("Succeeded starting ", orig_cmd)
 					return handle
+				} else {
+					log.Println("Failed")
+				}
+		} else {
+			cmd = fmt.Sprintf("%s.sh", orig_cmd)
+			log.Println("Trying ", cmd)
+			if _, err := os.Stat(cmd); !os.IsNotExist(err) {
+				handle = ActualStartSubproc(cmd, args)
+				return handle
+			} else {
+				log.Println("Trying ", orig_cmd)
+				if _, err := os.Stat(orig_cmd); !os.IsNotExist(err) {
+					handle := ActualStartSubproc(orig_cmd, args)
+					if handle != nil {
+						log.Println("Succeeded starting ", orig_cmd)
+						return handle
+					}
 				}
 			}
 		}
 	}
+	log.Printf("Failed to find %v in any known directory", orig_cmd)
 	return nil
 }
 
@@ -187,7 +207,7 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 	inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "announce", Arg: "spine"})}
 	*/
 	case "start-module":
-		go StartSubproc(m.Arg, []string{"pipes"})
+		go StartSubproc(m.Arg, []string{"pipes"}, []string{AppDirectory, SvarmrDirectory})
 		//go StartSubproc(fmt.Sprintf("%v.exe", m.Arg), []string{"pipes"})
 	case "debug":
 		log.Println(m.Arg)
@@ -242,6 +262,10 @@ func start_network() {
 */
 
 func main() {
+	SvarmrDirectory, _ = osext.ExecutableFolder()
+	AppDirectory, _ = os.Getwd()
+
+	log.Printf("Found svarmr in %v, running application from %v", SvarmrDirectory, AppDirectory)
 	inQ = make(chan connection, 200)
 	connList = make([]net.Conn, 0)
 	//Don't run network sockets from the server anymore, run the relay module
@@ -253,7 +277,7 @@ func main() {
 	//go StartSubproc("gui/gui.exe", []string{"pipes"})
 	for _, v := range os.Args[1:] {
 		log.Println("Starting ", v)
-		StartSubproc(v, []string{"pipes"})
+		StartSubproc(v, []string{"pipes"}, []string{AppDirectory, SvarmrDirectory})
 	}
 	go func() {
 		//time.Sleep(5.0 * time.Second)
