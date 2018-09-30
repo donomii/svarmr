@@ -1,6 +1,6 @@
 package main
 import (
-
+"strings"
 //"net/http"
 //_"net/http/pprof"
 //"runtime/pprof"
@@ -54,10 +54,13 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 							shutdown = 1
 						case "svarmrConnect" :
 							target := m.Arg
+							bit := strings.Split(target, ":")
+							server := bit[0]
+							port := bit[1]
 							relayID = fmt.Sprintf("relay (%v)",rand.Int(), os.Getpid())
 							altRelayID = fmt.Sprintf("relay %v:%v - %v",rand.Int(), os.Getpid(), target)
 							
-							conn2 := svarmrgo.ConnectHub(target)
+							conn2 := svarmrgo.ConnectHub(server, port)
 							go copyToStdout(conn2)
 						default:
 							if netPort != nil {
