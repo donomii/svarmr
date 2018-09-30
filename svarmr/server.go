@@ -6,6 +6,7 @@
 package main
 
 import (
+	"flag"
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -264,26 +265,33 @@ func start_network() {
 func main() {
 	SvarmrDirectory, _ = osext.ExecutableFolder()
 	AppDirectory, _ = os.Getwd()
+        //Server := ""
+        //Port := -1
+        //flag.StringVar(&Server, "server", "", "svarmr server address")
+        //flag.StringVar(&Port, "port", "", "svarmr server port")
+        flag.StringVar(&AppDirectory, "appdir", AppDirectory, "Full path to applicaton directory")
+        flag.StringVar(&SvarmrDirectory, "svarmrdir", SvarmrDirectory, "Full path to svarmr directory")
+	flag.Parse()
 
 	log.Printf("Found svarmr in %v, running application from %v", SvarmrDirectory, AppDirectory)
 	inQ = make(chan connection, 200)
 	connList = make([]net.Conn, 0)
 	//Don't run network sockets from the server anymore, run the relay module
 	//to handle TCP socket clients
-	//go start_network()
 	go broadcast(inQ)
 
 	//go StartSubproc("svarmr/clock.exe", []string{"pipes"})
 	//go StartSubproc("gui/gui.exe", []string{"pipes"})
-	for _, v := range os.Args[1:] {
+	for _, v := range flag.Args() {
 		log.Println("Starting ", v)
-		StartSubproc(v, []string{"pipes"}, []string{AppDirectory, SvarmrDirectory})
+		StartSubproc(v, []string{"--svarmrdir", SvarmrDirectory, "--appdir", AppDirectory}, []string{AppDirectory, SvarmrDirectory})
 	}
 	go func() {
 		//time.Sleep(5.0 * time.Second)
 		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "user-notify", Arg: "Server started"})}
 	}()
 	for {
-		time.Sleep(1.0 * time.Second)
+		time.Sleep(5.0 * time.Second)
+		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "debug", Arg: "Server main loop active"})}
 	}
 }
