@@ -11,6 +11,11 @@ go build usernotify.go
 go build moduleStarter.go
 cd ..
 
+cd nucular
+go build gui.go
+cd ..
+
+
 cd net
 go build relay.go
 go build mDNSprocessor.go
