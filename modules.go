@@ -4,6 +4,8 @@ package main
 import (
    _ "github.com/hashicorp/mdns"
    _ "github.com/andlabs/ui"
+   _ "github.com/getlantern/systray"
+   _ "github.com/oleksandr/bonjour"
    
 )
 
