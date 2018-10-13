@@ -216,6 +216,7 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 		log.Println(m.Arg)
 	case "error":
 		log.Println(m.Arg)
+	
 	}
 	return []svarmrgo.Message{}
 }
