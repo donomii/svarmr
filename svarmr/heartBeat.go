@@ -1,11 +1,10 @@
 package main
 
 import (
-    "strconv"
-    "os"
+  
     "github.com/donomii/svarmrgo"
     "time"
-"log"
+
 )
 
 func handleMessage(m svarmrgo.Message) (out []svarmrgo.Message) {
@@ -19,14 +18,8 @@ func handleMessage(m svarmrgo.Message) (out []svarmrgo.Message) {
 
 func main() {
     conn := svarmrgo.CliConnect()
-	arg := "1"
-    if len(os.Args) < 4 {
-        log.Println("Please supply a broadcast interval as the third command line argument")
-    } else {
-		arg = os.Args[3]
-	}
-    interval, _ := strconv.Atoi(arg) 
-    m := svarmrgo.Message{ Selector: "heartbeat", Arg: arg}
+	interval := 1
+    m := svarmrgo.Message{ Selector: "heartbeat", Arg: "bompf"}
     go svarmrgo.HandleInputLoop(conn, handleMessage)
     for {
 	    svarmrgo.SendMessage(conn, m)
