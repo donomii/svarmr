@@ -6,9 +6,9 @@
 package main
 
 import (
-	"flag"
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -18,6 +18,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
 	"github.com/kardianos/osext"
 	//"path/filepath"
 
@@ -78,7 +79,6 @@ func handleSubprocErrors(conn *subProx, Q chan connection) {
 
 }
 
-
 //Attempts to start a svarmr module.  Because we are cross platform, we have to check for multiple types of executable - on windows, we must support .bat and .exe, on linux we must support .sh and "no extension".  The user gives us a module name, and we go through, checking each extension.
 //We also have to check multiple locations for modules.  The intent is that the application developer writes their program in a separate directory, and then runs svarmr, which is installed in its own directory.  Every time a module is loaded, svarmr must check the application directory first, then the base svarmr directory.
 //To do this, pass a list of paths to StartSubproc, and the paths will be checked in order
@@ -108,11 +108,11 @@ func StartSubproc(orig_cmd string, args []string, paths []string) *subProx {
 				log.Println("Trying ", cmd)
 				handle = ActualStartSubproc(cmd, args)
 			}
-				if handle != nil {
-					return handle
-				} else {
-					log.Println("Failed")
-				}
+			if handle != nil {
+				return handle
+			} else {
+				log.Println("Failed")
+			}
 		} else {
 			cmd = fmt.Sprintf("%s.sh", orig_cmd)
 			log.Println("Trying ", cmd)
@@ -216,7 +216,7 @@ func handleMessage(m svarmrgo.Message) []svarmrgo.Message {
 		log.Println(m.Arg)
 	case "error":
 		log.Println(m.Arg)
-	
+
 	}
 	return []svarmrgo.Message{}
 }
@@ -266,12 +266,12 @@ func start_network() {
 func main() {
 	SvarmrDirectory, _ = osext.ExecutableFolder()
 	AppDirectory, _ = os.Getwd()
-        //Server := ""
-        //Port := -1
-        //flag.StringVar(&Server, "server", "", "svarmr server address")
-        //flag.StringVar(&Port, "port", "", "svarmr server port")
-        flag.StringVar(&AppDirectory, "appdir", AppDirectory, "Full path to applicaton directory")
-        flag.StringVar(&SvarmrDirectory, "svarmrdir", SvarmrDirectory, "Full path to svarmr directory")
+	//Server := ""
+	//Port := -1
+	//flag.StringVar(&Server, "server", "", "svarmr server address")
+	//flag.StringVar(&Port, "port", "", "svarmr server port")
+	flag.StringVar(&AppDirectory, "appdir", AppDirectory, "Full path to applicaton directory")
+	flag.StringVar(&SvarmrDirectory, "svarmrdir", SvarmrDirectory, "Full path to svarmr directory")
 	flag.Parse()
 
 	log.Printf("Found svarmr in %v, running application from %v", SvarmrDirectory, AppDirectory)
@@ -291,8 +291,9 @@ func main() {
 		//time.Sleep(5.0 * time.Second)
 		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "user-notify", Arg: "Server started"})}
 	}()
+
 	for {
 		time.Sleep(5.0 * time.Second)
-		inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "debug", Arg: "Server main loop active"})}
+		//inQ <- connection{nil, nil, svarmrgo.WireFormat(svarmrgo.Message{Selector: "debug", Arg: "Server main loop active"})}
 	}
 }
