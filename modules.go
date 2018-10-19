@@ -6,7 +6,7 @@ import (
    _ "github.com/andlabs/ui"
    _ "github.com/getlantern/systray"
    _ "github.com/oleksandr/bonjour"
-   
+   _ "github.com/kardianos/osext"
 )
 
 func main() {
