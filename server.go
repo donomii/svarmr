@@ -5,6 +5,7 @@
 //    server localhost 4816
 package main
 
+//This forces go get to download the required modules
 import (
 	"bufio"
 	"encoding/json"

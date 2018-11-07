@@ -1,8 +1,16 @@
+go build server.go
+
+
+	go get -u "github.com/andlabs/ui"
+	go get -u  "github.com/getlantern/systray"
+	go get -u  "github.com/hashicorp/mdns"
+	go get -u  "github.com/kardianos/osext"
+	go get -u  "github.com/oleksandr/bonjour"
+	
+	
 cd svarmr
 go build clock.go
 go build example.go
-go build server.go
-move server.exe ..
 go build heartBeat.go
 gcc monitor.c -Os -flto -omonitorc
 go build monitor.go
