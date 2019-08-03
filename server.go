@@ -40,16 +40,28 @@ type connection struct {
 }
 
 type subProx struct {
-	In  io.WriteCloser
-	Out io.ReadCloser
-	Err io.ReadCloser
-	Cmd *exec.Cmd
+	In   io.WriteCloser
+	Out  io.ReadCloser
+	Err  io.ReadCloser
+	Cmd  *exec.Cmd
+	Name string
 }
 
 //Read incoming messages and place them on the input queue
 func handleSubprocConnection(conn *subProx, Q chan connection) {
 
 	reader := bufio.NewReader(conn.Out)
+	ErrReader := bufio.NewReader(conn.Err)
+	go func() {
+		for {
+			t, err := ErrReader.ReadString('\n')
+			if err != nil {
+				//log.Println("Client disconnected: ", err)
+				return
+			}
+			log.Printf("%v: %v", conn.Name, t)
+		}
+	}()
 
 	for {
 		t, err := reader.ReadString('\n')
@@ -148,7 +160,7 @@ func ActualStartSubproc(cmd string, args []string) *subProx {
 	if err != nil {
 		return nil
 	}
-	p := subProx{grepIn, grepOut, grepErr, grepCmd}
+	p := subProx{grepIn, grepOut, grepErr, grepCmd, cmd}
 	subprocList = append(subprocList, &p)
 	go handleSubprocConnection(&p, inQ)
 	//Don't notify for every one, it floods the user

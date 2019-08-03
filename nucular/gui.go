@@ -50,7 +50,7 @@ func updatefn(w *nucular.Window) {
 	w.Label("Dynamic fixed column layout with generated position and size (LayoutRowDynamic):", "LC")
 	w.Row(30).Dynamic(1)
 	w.LabelColored("Hello", "LC", color.RGBA{255,255,255,255})
-	img, _ := glim.DrawStringRGBA(9.6, color.RGBA{255,255,255,255}, "Hello again", "f1.ttf")
+	img, _ := glim.DrawStringRGBA(9.6, glim.RGBA{255,255,255,255}, "Hello again", "f1.ttf")
 	newH := img.Bounds().Max.Y
 	w.Row(newH).Dynamic(1)
 	w.Image(img)
