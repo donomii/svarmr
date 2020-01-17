@@ -1,8 +1,11 @@
 //The message hub.  Server relays messages between programs
 //
-//Start with
+//Svarmr now works exclusively over STDIN/STDOUT for security.  There are TCP connector
+//modules if you want to link svarmr across multiple computers.
 //
-//    server localhost 4816
+//Start the server with:
+//
+//  server modulename modulename modulename
 package main
 
 //This forces go get to download the required modules
