@@ -1,10 +1,12 @@
 package chat
 
 type Message struct {
-	Author string `json:"author"`
-	Body   string `json:"body"`
+	Selector    string `json:"Selector"`
+	Arg         string `json:"Arg"`
+	NamedArgs   map[string]string `json:"NamedArgs"`
+    
 }
 
 func (self *Message) String() string {
-	return self.Author + " says " + self.Body
+	return "stringify: " + self.Selector + " : " + self.Arg
 }

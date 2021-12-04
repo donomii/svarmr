@@ -1,4 +1,5 @@
 package main
+//Starts another module, with correct command line opts
 
 import (
     "net"

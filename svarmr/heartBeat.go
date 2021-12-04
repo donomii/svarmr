@@ -1,26 +1,28 @@
 package main
+
 import (
-    "os"
+  
     "github.com/donomii/svarmrgo"
     "time"
-"net"
+
 )
 
+func handleMessage(m svarmrgo.Message) (out []svarmrgo.Message) {
+	switch m.Selector {
+	case "reveal-yourself":
+		out = append(out, svarmrgo.Message{Selector: "announce", Arg: "heartbeat"})
 
-func handleMessage (conn net.Conn, m svarmrgo.Message) {
-                    switch m.Selector {
-                         case "reveal-yourself" :
-                            svarmrgo.SendMessage(conn, svarmrgo.Message{Selector: "announce", Arg: "heartbeat"})
-                    }
-                }
+	}
+	return
+}
 
 func main() {
     conn := svarmrgo.CliConnect()
-    arg := os.Args[3]
-    m := svarmrgo.Message{ Selector: "heartbeat", Arg: arg}
-    go svarmrgo.HandleInputs(conn, handleMessage)
+	interval := 1
+    m := svarmrgo.Message{ Selector: "heartbeat", Arg: "bompf"}
+    go svarmrgo.HandleInputLoop(conn, handleMessage)
     for {
 	    svarmrgo.SendMessage(conn, m)
-	    time.Sleep(1000 * time.Millisecond)
+	    time.Sleep(time.Duration(interval) * 1000 * time.Millisecond)
 	}
 }
